@@ -5,6 +5,12 @@
         "**/bower_components": true
     },
     "files.associations": {
-        "bootloader.h": "c"
+        "bootloader.h": "c",
+        "math3d.h": "c",
+        "param.h": "c",
+        "stabilizer_types.h": "c",
+        "debug.h": "c",
+        "autoconf.h": "c",
+        "*.tcc": "c"
     }
 }

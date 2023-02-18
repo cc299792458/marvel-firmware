@@ -78,6 +78,8 @@ static ControllerType controllerType;
 static STATS_CNT_RATE_DEFINE(stabilizerRate, 500);
 static rateSupervisor_t rateSupervisorContext;
 static bool rateWarningDisplayed = false;
+//Switch between conventional quadrotor and gimabl thrust generator. 0 refers to quadrotor, 1 refers to gimbal thrust generator.
+static bool mode = true; 
 
 static struct {
   // position - mm
@@ -238,6 +240,13 @@ static void stabilizerTask(void* param)
   rateSupervisorInit(&rateSupervisorContext, xTaskGetTickCount(), M2T(1000), 997, 1003, 1);
 
   DEBUG_PRINT("Ready to fly.\n");
+  // Verify mode, 2023/02/19
+  if(mode){
+    DEBUG_PRINT("Current mode is quadrotor.\n");
+  }
+  else{
+    DEBUG_PRINT("Current mode is gimabl thrust generator.\n");
+  }
 
   // This is the core framework of controlling the crazyflie, 2023/02/13
   while(1) {
@@ -260,6 +269,7 @@ static void stabilizerTask(void* param)
         controllerInit(controllerType);
         controllerType = getControllerType();
       }
+      // DEBUG_PRINT("Current Controller:%d\n", controllerType);
 
       stateEstimator(&state, tick);
       compressState();
