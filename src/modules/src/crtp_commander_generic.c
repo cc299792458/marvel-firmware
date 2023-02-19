@@ -385,17 +385,17 @@ static void twoDDecoder(setpoint_t *setpoint, uint8_t type, const void *data, si
 {
   const struct twoDPacket_s *values = data;
 
-  setpoint->attitude.roll = (float)values->index; // use roll to save index number
+  setpoint->attitude.yaw = (float)values->index; // use yaw to save index number
 
   setpoint->attitudeQuaternion.w = values->w;
   setpoint->attitudeQuaternion.x = values->x;
   setpoint->attitudeQuaternion.y = values->y;
   setpoint->attitudeQuaternion.z = values->z;
 
-  setpoint->attitude.pitch = values->alpha;
-  setpoint->attitude.yaw = values->beta;
-  
+  setpoint->attitude.roll = values->alpha;
+  setpoint->attitude.pitch = values->beta;
 
+  setpoint->thrust = values->thrust;
 
   // setpoint->mode.x = modeAbs;
   // setpoint->mode.y = modeAbs;

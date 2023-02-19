@@ -26,6 +26,8 @@ static float r_pitch;
 static float r_yaw;
 static float accelz;
 
+static bool mode=true;
+
 void controllerPidInit(void)
 {
   attitudeControllerInit(ATTITUDE_UPDATE_DT);
@@ -59,8 +61,24 @@ void controllerPid(control_t *control, setpoint_t *setpoint,
                                          const sensorData_t *sensors,
                                          const state_t *state,
                                          const uint32_t tick)
-{
-  if (true){
+{ 
+  /* Use setpoint->attitudeQuaternion as switch.
+    For quadrotor mode, all kinds of methods to set setpoint 
+    will keep setpoint->attitudeQuaternion = 0.
+    In the contrast, for gimbal mode, we will use w, x, y, z, 
+    so that they won't be 0. 
+  */ 
+  if ((setpoint->attitudeQuaternion.w+setpoint->attitudeQuaternion.x+setpoint->attitudeQuaternion.y+setpoint->attitudeQuaternion.z) == 0){
+    mode = true;
+    // if (setpoint->thrust != 0){
+    //   DEBUG_PRINT("True\n");
+    // }
+  }
+  else{
+    mode = false;
+    DEBUG_PRINT("False\n");
+  }
+  if (mode){
     // DEBUG_PRINT("Current mode is conventional quadrotor!\n");
     if (RATE_DO_EXECUTE(ATTITUDE_RATE, tick)) {
       // Rate-controled YAW is moving YAW angle setpoint
@@ -160,6 +178,8 @@ void controllerPid(control_t *control, setpoint_t *setpoint,
   else{
     // add gimbal controller here.
     // DEBUG_PRINT("Current mode is gimbal thrust generator!\n");
+    
+    control->thrust = 30000;  // use to test switching mode
   }
 }
 
