@@ -372,27 +372,41 @@ static void positionDecoder(setpoint_t *setpoint, uint8_t type, const void *data
  * Need to adjust
  */
  struct twoDPacket_s {
-   float x;     // Position in m
+   uint8_t index;
+   float w;     
+   float x;
    float y;
    float z;
-   float yaw;   // Orientation in degree
+   float alpha;
+   float beta;
+   float thrust;   
  } __attribute__((packed));
 static void twoDDecoder(setpoint_t *setpoint, uint8_t type, const void *data, size_t datalen)
 {
   const struct twoDPacket_s *values = data;
 
-  setpoint->mode.x = modeAbs;
-  setpoint->mode.y = modeAbs;
-  setpoint->mode.z = modeAbs;
+  setpoint->attitude.roll = (float)values->index; // use roll to save index number
 
-  setpoint->position.x = values->x;
-  setpoint->position.y = values->y;
-  setpoint->position.z = values->z;
+  setpoint->attitudeQuaternion.w = values->w;
+  setpoint->attitudeQuaternion.x = values->x;
+  setpoint->attitudeQuaternion.y = values->y;
+  setpoint->attitudeQuaternion.z = values->z;
+
+  setpoint->attitude.pitch = values->alpha;
+  setpoint->attitude.yaw = values->beta;
+  
 
 
-  setpoint->mode.yaw = modeAbs;
+  // setpoint->mode.x = modeAbs;
+  // setpoint->mode.y = modeAbs;
+  // setpoint->mode.z = modeAbs;
 
-  setpoint->attitude.yaw = values->yaw;
+  // setpoint->position.x = values->x;
+  // setpoint->position.y = values->y;
+  // setpoint->position.z = values->z;
+
+  // setpoint->mode.yaw = modeAbs;
+  // setpoint->attitude.yaw = values->yaw;
 }
 
  /* ---===== 3 - packetDecoders array =====--- */
