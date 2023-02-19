@@ -71,6 +71,7 @@ enum packet_type {
   hoverType         = 5,
   fullStateType     = 6,
   positionType      = 7,
+  twoDType          = 8,
 };
 
 /* ---===== 2 - Decoding functions =====--- */
@@ -367,6 +368,33 @@ static void positionDecoder(setpoint_t *setpoint, uint8_t type, const void *data
   setpoint->attitude.yaw = values->yaw;
 }
 
+/* twoDDecoder
+ * Need to adjust
+ */
+ struct twoDPacket_s {
+   float x;     // Position in m
+   float y;
+   float z;
+   float yaw;   // Orientation in degree
+ } __attribute__((packed));
+static void twoDDecoder(setpoint_t *setpoint, uint8_t type, const void *data, size_t datalen)
+{
+  const struct twoDPacket_s *values = data;
+
+  setpoint->mode.x = modeAbs;
+  setpoint->mode.y = modeAbs;
+  setpoint->mode.z = modeAbs;
+
+  setpoint->position.x = values->x;
+  setpoint->position.y = values->y;
+  setpoint->position.z = values->z;
+
+
+  setpoint->mode.yaw = modeAbs;
+
+  setpoint->attitude.yaw = values->yaw;
+}
+
  /* ---===== 3 - packetDecoders array =====--- */
 const static packetDecoder_t packetDecoders[] = {
   [stopType]          = stopDecoder,
@@ -377,6 +405,7 @@ const static packetDecoder_t packetDecoders[] = {
   [hoverType]         = hoverDecoder,
   [fullStateType]     = fullStateDecoder,
   [positionType]      = positionDecoder,
+  [twoDType]          = twoDDecoder,
 };
 
 /* Decoder switch */
@@ -392,7 +421,7 @@ void crtpCommanderGenericDecodeSetpoint(setpoint_t *setpoint, CRTPPacket *pk)
 
   uint8_t type = pk->data[0];
 
-  memset(setpoint, 0, sizeof(setpoint_t));
+  memset(setpoint, 0, sizeof(setpoint_t));  // Initialized to 0 
 
   if (type<nTypes && (packetDecoders[type] != NULL)) {
     packetDecoders[type](setpoint, type, ((char*)pk->data)+1, pk->size-1);
