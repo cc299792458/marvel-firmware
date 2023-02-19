@@ -10,6 +10,7 @@
 #include "log.h"
 #include "param.h"
 #include "math3d.h"
+#include "math.h"
 
 #define ATTITUDE_UPDATE_DT    (float)(1.0f/ATTITUDE_RATE)
 
@@ -27,6 +28,9 @@ static float r_yaw;
 static float accelz;
 
 static bool mode=true;
+
+static float alphaAcc;
+static float betaAcc;
 
 void controllerPidInit(void)
 {
@@ -104,11 +108,11 @@ void controllerPid(control_t *control, setpoint_t *setpoint,
       attitudeDesired.yaw = capAngle(attitudeDesired.yaw);
     }
 
-    if (RATE_DO_EXECUTE(POSITION_RATE, tick)) {
+    if (RATE_DO_EXECUTE(POSITION_RATE, tick)) { // 100Hz
       positionController(&actuatorThrust, &attitudeDesired, setpoint, state);
     }
 
-    if (RATE_DO_EXECUTE(ATTITUDE_RATE, tick)) {
+    if (RATE_DO_EXECUTE(ATTITUDE_RATE, tick)) { // 500Hz
       // Switch between manual and automatic position control
       if (setpoint->mode.z == modeDisable) {
         actuatorThrust = setpoint->thrust;
@@ -178,11 +182,27 @@ void controllerPid(control_t *control, setpoint_t *setpoint,
   else{
     // add gimbal controller here.
     // DEBUG_PRINT("Current mode is gimbal thrust generator!\n");
+    if (RATE_DO_EXECUTE(ATTITUDE_RATE, tick)){  // 500Hz
+      gimbalJointEstimator(setpoint, state);
+      gimbalControllerPID(setpoint, state, &alphaAcc, &betaAcc);
+      // gimbalMotorCommandMapping(&alphaAcc, &betaAcc, control);
+      control->thrust = 30000;  // use to test switching mode
+    }
     
-    control->thrust = 30000;  // use to test switching mode
   }
 }
 
+void gimbalJointEstimator(setpoint_t *setpoint, const state_t *state){
+  // adjust state.roll and state.pitch to alpha_ie and beta_ie
+}
+
+void gimbalControllerPID(setpoint_t *setpoint, const state_t *state, float *alphaAcc, float *betaAcc){
+
+}
+
+void gimbalMotorCommandMapping(float *alphaAcc, float *betaAcc, control_t *control){
+
+}
 /**
  * Logging variables for the command and reference signals for the
  * altitude PID controller
