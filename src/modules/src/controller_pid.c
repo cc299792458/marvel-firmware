@@ -35,6 +35,23 @@ static float beta;
 static float alphaAcc;
 static float betaAcc;
 
+static float deriv_alpha;
+static float integ_alpha;
+static float pre_error_alpha;
+static float deriv_beta;
+static float integ_beta;
+static float pre_error_beta;
+
+const float arm_length = 0.031;
+const float ctau = 0.00596;
+
+const float kp_alpha = 3;
+const float ki_alpha = 0;
+const float kd_alpha = 0;
+const float kp_beta = 3;
+const float ki_beta = 0;
+const float kd_beta = 0;
+
 void controllerPidInit(void)
 {
   attitudeControllerInit(ATTITUDE_UPDATE_DT);
@@ -187,8 +204,8 @@ void controllerPid(control_t *control, setpoint_t *setpoint,
     // DEBUG_PRINT("Current mode is gimbal thrust generator!\n");
     if (RATE_DO_EXECUTE(ATTITUDE_RATE, tick)){  // 500Hz
       gimbalJointEstimator(setpoint, state, &alpha, &beta);
-      gimbalControllerPID(setpoint, state, &alphaAcc, &betaAcc);
-      // gimbalMotorCommandMapping(&alphaAcc, &betaAcc, control);
+      gimbalControllerPID(setpoint, alpha, beta, &alphaAcc, &betaAcc);
+      gimbalMotorCommandMapping(setpoint, alphaAcc, betaAcc, alpha, beta, control);
       control->thrust = 30000;  // use to test switching mode
     }
     
@@ -268,12 +285,39 @@ void gimbalJointEstimator(setpoint_t *setpoint, const state_t *state, float *alp
   *beta = atan2(R_Bi_i[0][2], R_Bi_i[0][0]);
 }
 
-void gimbalControllerPID(setpoint_t *setpoint, const state_t *state, float *alphaAcc, float *betaAcc){
+void gimbalControllerPID(setpoint_t *setpoint, float alpha, float beta, float *alphaAcc, float *betaAcc){
+  float desired_alpha = setpoint->attitude.roll;
+  float desired_beta = setpoint->attitude.pitch;
+  float error_alpha = desired_alpha - alpha;
+  float error_beta = desired_beta - beta;
+  float dt = (float)(1.0f/ATTITUDE_RATE);
 
+  deriv_alpha = (error_alpha - pre_error_alpha) / dt;
+  deriv_beta = (error_beta - pre_error_beta) / dt;
+  
+  pre_error_alpha = error_alpha;
+  pre_error_beta = error_beta;
+
+  integ_alpha += error_alpha * dt;
+  integ_beta += error_beta * dt;
+
+  *alphaAcc = kp_alpha * error_alpha + ki_alpha * integ_alpha + kd_alpha * deriv_alpha;
+  *betaAcc = kp_beta * error_beta + ki_beta * integ_beta + kd_beta * deriv_beta;
 }
 
-void gimbalMotorCommandMapping(float *alphaAcc, float *betaAcc, control_t *control){
+void gimbalMotorCommandMapping(setpoint_t *setpoint, float alphaAcc, float betaAcc, float alpha, float beta, control_t *control){
   
+  float thrust = setpoint->thrust;
+  float tauix = alphaAcc*((float)cos(beta));
+  float tauiy = betaAcc;
+  float tauiz = alphaAcc*((float)sin(beta));
+  float c1 = 0.25;    //const
+  float c2 = 1/(4*arm_length);
+  float c3 = 1/(4*ctau);
+  control->roll=c1*thrust+c2*tauix-c2*tauiy-c3*tauiz;   //t1
+  control->pitch=c1*thrust-c2*tauix-c2*tauiy+c3*tauiz;   //t2
+  control->yaw=c1*thrust-c2*tauix+c2*tauiy-c3*tauiz;   //t2
+  control->thrust=c1*thrust+c2*tauix+c2*tauiy+c3*tauiz;   //t2
 }
 /**
  * Logging variables for the command and reference signals for the

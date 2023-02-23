@@ -296,7 +296,12 @@ static void stabilizerTask(void* param)
       if (emergencyStop || (systemIsArmed() == false)) {
         motorsStop();
       } else {
-        powerDistribution(&motorPower, &control);
+        if((setpoint.attitudeQuaternion.w+setpoint.attitudeQuaternion.x+setpoint.attitudeQuaternion.y+setpoint.attitudeQuaternion.z) == 0){
+          powerDistribution(&motorPower, &control);
+        }
+        else{
+          powerDistributionGimbal(&motorPower, &control);
+        }
         motorsSetRatio(MOTOR_M1, motorPower.m1);
         motorsSetRatio(MOTOR_M2, motorPower.m2);
         motorsSetRatio(MOTOR_M3, motorPower.m3);

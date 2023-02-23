@@ -40,6 +40,7 @@
 #endif
 
 static uint32_t idleThrust = DEFAULT_IDLE_THRUST;
+const float mappingConsant = 6000;  // 60000/10
 
 void powerDistributionInit(void)
 {
@@ -61,6 +62,27 @@ void powerDistribution(motors_thrust_t* motorPower, const control_t *control)
   motorPower->m2 = limitThrust(control->thrust - r - p - control->yaw);
   motorPower->m3 =  limitThrust(control->thrust + r - p + control->yaw);
   motorPower->m4 =  limitThrust(control->thrust + r + p - control->yaw);
+
+  if (motorPower->m1 < idleThrust) {
+    motorPower->m1 = idleThrust;
+  }
+  if (motorPower->m2 < idleThrust) {
+    motorPower->m2 = idleThrust;
+  }
+  if (motorPower->m3 < idleThrust) {
+    motorPower->m3 = idleThrust;
+  }
+  if (motorPower->m4 < idleThrust) {
+    motorPower->m4 = idleThrust;
+  }
+}
+
+void powerDistributionGimbal(motors_thrust_t* motorPower, const control_t *control)
+{
+  motorPower->m1 = limitThrust(mappingConsant*control->roll);
+  motorPower->m2 = limitThrust(mappingConsant*control->pitch);
+  motorPower->m3 = limitThrust(mappingConsant*control->yaw);
+  motorPower->m4 = limitThrust(mappingConsant*control->thrust);
 
   if (motorPower->m1 < idleThrust) {
     motorPower->m1 = idleThrust;

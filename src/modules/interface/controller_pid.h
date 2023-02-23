@@ -35,6 +35,6 @@ void controllerPid(control_t *control, setpoint_t *setpoint,
                                          const state_t *state,
                                          const uint32_t tick);
 void gimbalJointEstimator(setpoint_t *setpoint, const state_t *state, float *alpha, float *beta);
-void gimbalControllerPID(setpoint_t *setpoint, const state_t *state, float *alphaAcc, float *betaAcc);
-void gimbalMotorCommandMapping(float *alphaAcc, float *betaAcc, control_t *control);
+void gimbalControllerPID(setpoint_t *setpoint, float alpha, float beta, float *alphaAcc, float *betaAcc);
+void gimbalMotorCommandMapping(setpoint_t *setpoint,float alphaAcc, float betaAcc, float alpha, float beta, control_t *control);
 #endif //__CONTROLLER_PID_H__

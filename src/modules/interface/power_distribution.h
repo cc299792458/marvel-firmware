@@ -32,5 +32,6 @@
 void powerDistributionInit(void);
 bool powerDistributionTest(void);
 void powerDistribution(motors_thrust_t* motorPower, const control_t *control);
+void powerDistributionGimbal(motors_thrust_t* motorPower, const control_t *control);
 
 #endif //__POWER_DISTRIBUTION_H__
