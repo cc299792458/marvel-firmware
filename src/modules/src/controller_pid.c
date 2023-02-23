@@ -27,8 +27,11 @@ static float r_pitch;
 static float r_yaw;
 static float accelz;
 
+const float PI = 3.14159;
 static bool mode=true;
 
+static float alpha;
+static float beta;
 static float alphaAcc;
 static float betaAcc;
 
@@ -183,7 +186,7 @@ void controllerPid(control_t *control, setpoint_t *setpoint,
     // add gimbal controller here.
     // DEBUG_PRINT("Current mode is gimbal thrust generator!\n");
     if (RATE_DO_EXECUTE(ATTITUDE_RATE, tick)){  // 500Hz
-      gimbalJointEstimator(setpoint, state);
+      gimbalJointEstimator(setpoint, state, &alpha, &beta);
       gimbalControllerPID(setpoint, state, &alphaAcc, &betaAcc);
       // gimbalMotorCommandMapping(&alphaAcc, &betaAcc, control);
       control->thrust = 30000;  // use to test switching mode
@@ -192,8 +195,77 @@ void controllerPid(control_t *control, setpoint_t *setpoint,
   }
 }
 
-void gimbalJointEstimator(setpoint_t *setpoint, const state_t *state){
-  // adjust state.roll and state.pitch to alpha_ie and beta_ie
+void quat2Rotmat(float rotmat[3][3], float quat[4]){
+  // quat: w, x, y, z
+  float w = quat[0];
+  float x = quat[1];
+  float y = quat[2];
+  float z = quat[3];
+  rotmat[0][0] = 1-2*y*y-2*z*z;
+  rotmat[0][1] = 2*x*y-2*w*z;
+  rotmat[0][2] = 2*x*z+2*w*y;
+  rotmat[1][0] = 2*x*y+2*w*z;
+  rotmat[1][1] = 1-2*x*x-2*z*z;
+  rotmat[1][2] = 2*y*z-2*w*x;
+  rotmat[2][0] = 2*x*z-2*w*y;
+  rotmat[2][1] = 2*y*z+2*w*x;
+  rotmat[2][2] = 1-2*y*y-2*y*y;
+}
+
+void matMulti(float mat1[3][3], float mat2[3][3], float mat_result[3][3]){
+  mat_result[0][0] = mat1[0][0]*mat2[0][0]+mat1[0][1]*mat2[1][0]+mat1[0][2]*mat2[2][0];
+  mat_result[0][1] = mat1[0][0]*mat2[0][1]+mat1[0][1]*mat2[1][1]+mat1[0][2]*mat2[2][1];
+  mat_result[0][2] = mat1[0][0]*mat2[0][2]+mat1[0][1]*mat2[1][2]+mat1[0][2]*mat2[2][2];
+  mat_result[1][0] = mat1[1][0]*mat2[0][0]+mat1[1][1]*mat2[1][0]+mat1[1][2]*mat2[2][0];
+  mat_result[1][1] = mat1[1][0]*mat2[0][1]+mat1[1][1]*mat2[1][1]+mat1[1][2]*mat2[2][1];
+  mat_result[1][2] = mat1[1][0]*mat2[0][2]+mat1[1][1]*mat2[1][2]+mat1[1][2]*mat2[2][2];
+  mat_result[2][0] = mat1[2][0]*mat2[0][0]+mat1[2][1]*mat2[1][0]+mat1[2][2]*mat2[2][0];
+  mat_result[2][1] = mat1[2][0]*mat2[0][1]+mat1[2][1]*mat2[1][1]+mat1[2][2]*mat2[2][1];
+  mat_result[2][2] = mat1[2][0]*mat2[0][2]+mat1[2][1]*mat2[1][2]+mat1[2][2]*mat2[2][2];  
+}
+
+void matTrans(float mat[3][3], float mat_result[3][3]){
+  mat_result[0][0] = mat[0][0];
+  mat_result[0][1] = mat[1][0];
+  mat_result[0][2] = mat[2][0];
+  mat_result[1][0] = mat[0][1];
+  mat_result[1][1] = mat[1][1];
+  mat_result[1][2] = mat[2][1];
+  mat_result[2][0] = mat[0][2];
+  mat_result[2][1] = mat[1][2];
+  mat_result[2][2] = mat[2][2];
+}
+
+void rotMatZ(float mat[3][3], float index){
+  float theta = index * PI / 4;
+  // float mat[3][3];
+  mat[0][0] = cos(theta);
+  mat[1][1] = cos(theta);
+  mat[0][1] = sin(theta);
+  mat[1][0] = -sin(theta);
+}
+
+void gimbalJointEstimator(setpoint_t *setpoint, const state_t *state, float *alpha, float *beta){
+  float R_Bi_i[3][3];
+  float R_temp_1[3][3];
+  float R_temp_2[3][3];
+
+  float quat_W_B[4];
+  float quat_W_i[4];
+
+  float R_W_B[3][3];
+  quat2Rotmat(R_W_B, quat_W_B);
+  float R_B_Bi[3][3];
+  rotMatZ(R_B_Bi, setpoint->attitude.yaw);
+  float R_W_i[3][3];
+  quat2Rotmat(R_W_i, quat_W_i);
+  
+  matMulti(R_W_B, R_B_Bi, R_temp_1);
+  matTrans(R_temp_1, R_temp_2);
+  matMulti(R_temp_2, R_W_i, R_Bi_i);
+
+  *alpha = atan2(R_Bi_i[2][1], R_Bi_i[1][1]);
+  *beta = atan2(R_Bi_i[0][2], R_Bi_i[0][0]);
 }
 
 void gimbalControllerPID(setpoint_t *setpoint, const state_t *state, float *alphaAcc, float *betaAcc){
@@ -201,7 +273,7 @@ void gimbalControllerPID(setpoint_t *setpoint, const state_t *state, float *alph
 }
 
 void gimbalMotorCommandMapping(float *alphaAcc, float *betaAcc, control_t *control){
-
+  
 }
 /**
  * Logging variables for the command and reference signals for the
