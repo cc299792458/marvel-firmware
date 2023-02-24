@@ -207,8 +207,8 @@ void controllerPid(control_t *control, setpoint_t *setpoint,
     if (RATE_DO_EXECUTE(ATTITUDE_RATE, tick)){  // 500Hz
       gimbalJointEstimator(setpoint, state, &alpha, &beta);
       float co = 1.25f;
-      // DEBUG_PRINT("alpha:%f", alpha);
-      DEBUG_PRINT("co:%d.%d\n", (int)co, (int)(co-(int)co)*1000000);
+      DEBUG_PRINT("co:%f\n", (double)co);
+      // DEBUG_PRINT("co:%d.%d\n", (int)co, (int)(co-(int)co)*1000000);
       // DEBUG_PRINT("beta:");
       // DEBUG_PRINT("%f\n", (float)beta);
       gimbalControllerPID(setpoint, alpha, beta, &alphaAcc, &betaAcc);
