@@ -289,10 +289,10 @@ static void stabilizerTask(void* param)
       setpoint.attitudeQuaternion.y = 0.0f;
       setpoint.attitudeQuaternion.z = 0.0f;
 
-      setpoint.attitude.roll = 0.0f;
+      setpoint.attitude.roll = 1.0f;
       setpoint.attitude.pitch = 0.0f;
 
-      setpoint.thrust = 2.0f;
+      setpoint.thrust = 4.0f;
       controller(&control, &setpoint, &sensorData, &state, tick);
 
       checkEmergencyStopTimeout();

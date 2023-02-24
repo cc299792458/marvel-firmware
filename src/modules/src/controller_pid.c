@@ -30,11 +30,6 @@ static float accelz;
 const float PI = 3.14159f;
 static bool mode=true;
 
-static float alpha = 0.0f;
-static float beta = 0.0f;
-static float alphaAcc = 0.0f;
-static float betaAcc = 0.0f;
-
 static float deriv_alpha;
 static float integ_alpha;
 static float pre_error_alpha;
@@ -205,13 +200,15 @@ void controllerPid(control_t *control, setpoint_t *setpoint,
     // add gimbal controller here.
     // DEBUG_PRINT("Current mode is gimbal thrust generator!\n");
     if (RATE_DO_EXECUTE(ATTITUDE_RATE, tick)){  // 500Hz
+      float alpha = 0.0f;
+      float beta = 0.0f;
+      float alphaAcc = 0.0f;
+      float betaAcc = 0.0f;
       gimbalJointEstimator(setpoint, state, &alpha, &beta);
-      float co = 1.25f;
-      DEBUG_PRINT("co:%f\n", (double)co);
-      // DEBUG_PRINT("co:%d.%d\n", (int)co, (int)(co-(int)co)*1000000);
-      // DEBUG_PRINT("beta:");
-      // DEBUG_PRINT("%f\n", (float)beta);
+      // DEBUG_PRINT("alpha%f\n:", (double)alpha);
+
       gimbalControllerPID(setpoint, alpha, beta, &alphaAcc, &betaAcc);
+      // DEBUG_PRINT("alphaAcc:%f\n", (double)alphaAcc);
       gimbalMotorCommandMapping(setpoint, alphaAcc, betaAcc, alpha, beta, control);
       // control->thrust = 30000;  // use to test switching mode
     }
@@ -298,7 +295,8 @@ void gimbalControllerPID(setpoint_t *setpoint, float alpha, float beta, float *a
   float error_alpha = desired_alpha - alpha;
   float error_beta = desired_beta - beta;
   float dt = (float)(1.0f/ATTITUDE_RATE);
-
+  // DEBUG_PRINT("da:%f\n", (double)desired_alpha);
+  DEBUG_PRINT("ea:%f\n", (double)error_alpha);
   deriv_alpha = (error_alpha - pre_error_alpha) / dt;
   deriv_beta = (error_beta - pre_error_beta) / dt;
   
@@ -323,8 +321,12 @@ void gimbalMotorCommandMapping(setpoint_t *setpoint, float alphaAcc, float betaA
   float c3 = (float)1/(4*ctau);
   control->roll=c1*thrust+c2*tauix-c2*tauiy-c3*tauiz;   //t1
   control->pitch=c1*thrust-c2*tauix-c2*tauiy+c3*tauiz;   //t2
-  control->yaw=c1*thrust-c2*tauix+c2*tauiy-c3*tauiz;   //t2
-  control->thrust=c1*thrust+c2*tauix+c2*tauiy+c3*tauiz;   //t2
+  control->yaw=c1*thrust-c2*tauix+c2*tauiy-c3*tauiz;   //t3
+  control->thrust=c1*thrust+c2*tauix+c2*tauiy+c3*tauiz;   //t4
+  // DEBUG_PRINT("t1:%f\n", (double)control->roll);
+  // DEBUG_PRINT("t2:%f\n", (double)control->pitch);
+  // DEBUG_PRINT("t3:%f\n", (double)control->yaw);
+  // DEBUG_PRINT("t4:%f\n", (double)control->thrust);
 }
 /**
  * Logging variables for the command and reference signals for the
