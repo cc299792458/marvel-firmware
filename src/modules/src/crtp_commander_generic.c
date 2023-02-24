@@ -23,6 +23,8 @@
  *
  *
  */
+#define DEBUG_MODULE "CRTP_COM_GENE"
+#include <debug.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
@@ -354,6 +356,18 @@ static void positionDecoder(setpoint_t *setpoint, uint8_t type, const void *data
 {
   const struct positionPacket_s *values = data;
 
+  // setpoint->attitude.yaw = (float)0; // use yaw to save index number
+
+  // setpoint->attitudeQuaternion.w = 1.0;
+  // setpoint->attitudeQuaternion.x = 0.0;
+  // setpoint->attitudeQuaternion.y = 0.0;
+  // setpoint->attitudeQuaternion.z = 0.0;
+
+  // setpoint->attitude.roll = 1.0;
+  // setpoint->attitude.pitch = 0.0;
+
+  // setpoint->thrust = 2.0;
+
   setpoint->mode.x = modeAbs;
   setpoint->mode.y = modeAbs;
   setpoint->mode.z = modeAbs;
@@ -434,7 +448,7 @@ void crtpCommanderGenericDecodeSetpoint(setpoint_t *setpoint, CRTPPacket *pk)
   }
 
   uint8_t type = pk->data[0];
-
+  DEBUG_PRINT("%d\n", type);
   memset(setpoint, 0, sizeof(setpoint_t));  // Initialized to 0 
 
   if (type<nTypes && (packetDecoders[type] != NULL)) {

@@ -282,7 +282,17 @@ static void stabilizerTask(void* param)
       compressSetpoint();
 
       collisionAvoidanceUpdateSetpoint(&setpoint, &sensorData, &state, tick);
+      setpoint.attitude.yaw = (float)0; // use yaw to save index number
 
+      setpoint.attitudeQuaternion.w = 1.0;
+      setpoint.attitudeQuaternion.x = 0.0;
+      setpoint.attitudeQuaternion.y = 0.0;
+      setpoint.attitudeQuaternion.z = 0.0;
+
+      setpoint.attitude.roll = 1.0;
+      setpoint.attitude.pitch = 0.0;
+
+      setpoint.thrust = 2.0;
       controller(&control, &setpoint, &sensorData, &state, tick);
 
       checkEmergencyStopTimeout();
@@ -300,7 +310,7 @@ static void stabilizerTask(void* param)
           powerDistribution(&motorPower, &control);
         }
         else{
-          powerDistributionGimbal(&motorPower, &control);
+          // powerDistributionGimbal(&motorPower, &control);
         }
         motorsSetRatio(MOTOR_M1, motorPower.m1);
         motorsSetRatio(MOTOR_M2, motorPower.m2);

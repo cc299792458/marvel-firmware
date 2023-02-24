@@ -27,13 +27,13 @@ static float r_pitch;
 static float r_yaw;
 static float accelz;
 
-const float PI = 3.14159;
+const float PI = 3.14159f;
 static bool mode=true;
 
-static float alpha;
-static float beta;
-static float alphaAcc;
-static float betaAcc;
+static float alpha = 0.0f;
+static float beta = 0.0f;
+static float alphaAcc = 0.0f;
+static float betaAcc = 0.0f;
 
 static float deriv_alpha;
 static float integ_alpha;
@@ -42,15 +42,15 @@ static float deriv_beta;
 static float integ_beta;
 static float pre_error_beta;
 
-const float arm_length = 0.031;
-const float ctau = 0.00596;
+const float arm_length = 0.031f;
+const float ctau = 0.00596f;
 
-const float kp_alpha = 3;
-const float ki_alpha = 0;
-const float kd_alpha = 0;
-const float kp_beta = 3;
-const float ki_beta = 0;
-const float kd_beta = 0;
+const float kp_alpha = 3.0f;
+const float ki_alpha = 0.0f;
+const float kd_alpha = 0.0f;
+const float kp_beta = 3.0f;
+const float ki_beta = 0.0f;
+const float kd_beta = 0.0f;
 
 void controllerPidInit(void)
 {
@@ -92,16 +92,18 @@ void controllerPid(control_t *control, setpoint_t *setpoint,
     In the contrast, for gimbal mode, we will use w, x, y, z, 
     so that they won't be 0. 
   */ 
-  if ((setpoint->attitudeQuaternion.w+setpoint->attitudeQuaternion.x+setpoint->attitudeQuaternion.y+setpoint->attitudeQuaternion.z) == 0){
-    mode = true;
-    // if (setpoint->thrust != 0){
-    //   DEBUG_PRINT("True\n");
-    // }
-  }
-  else{
-    mode = false;
-    DEBUG_PRINT("False\n");
-  }
+  // if ((setpoint->attitudeQuaternion.w+setpoint->attitudeQuaternion.x+setpoint->attitudeQuaternion.y+setpoint->attitudeQuaternion.z) == 0){
+  //   mode = true;
+  //   int num = 1;
+  //   if (setpoint->thrust != 0){
+  //     DEBUG_PRINT("%d\n", num);
+  //   }
+  // }
+  // else{
+  //   mode = false;
+  //   DEBUG_PRINT("False\n");
+  // }
+  mode = false;
   if (mode){
     // DEBUG_PRINT("Current mode is conventional quadrotor!\n");
     if (RATE_DO_EXECUTE(ATTITUDE_RATE, tick)) {
@@ -204,9 +206,14 @@ void controllerPid(control_t *control, setpoint_t *setpoint,
     // DEBUG_PRINT("Current mode is gimbal thrust generator!\n");
     if (RATE_DO_EXECUTE(ATTITUDE_RATE, tick)){  // 500Hz
       gimbalJointEstimator(setpoint, state, &alpha, &beta);
+      float co = 1.25f;
+      // DEBUG_PRINT("alpha:%f", alpha);
+      DEBUG_PRINT("co:%d.%d\n", (int)co, (int)(co-(int)co)*1000000);
+      // DEBUG_PRINT("beta:");
+      // DEBUG_PRINT("%f\n", (float)beta);
       gimbalControllerPID(setpoint, alpha, beta, &alphaAcc, &betaAcc);
       gimbalMotorCommandMapping(setpoint, alphaAcc, betaAcc, alpha, beta, control);
-      control->thrust = 30000;  // use to test switching mode
+      // control->thrust = 30000;  // use to test switching mode
     }
     
   }
@@ -311,9 +318,9 @@ void gimbalMotorCommandMapping(setpoint_t *setpoint, float alphaAcc, float betaA
   float tauix = alphaAcc*((float)cos(beta));
   float tauiy = betaAcc;
   float tauiz = alphaAcc*((float)sin(beta));
-  float c1 = 0.25;    //const
-  float c2 = 1/(4*arm_length);
-  float c3 = 1/(4*ctau);
+  float c1 = 0.25f;    //const
+  float c2 = (float)1/(4*arm_length);
+  float c3 = (float)1/(4*ctau);
   control->roll=c1*thrust+c2*tauix-c2*tauiy-c3*tauiz;   //t1
   control->pitch=c1*thrust-c2*tauix-c2*tauiy+c3*tauiz;   //t2
   control->yaw=c1*thrust-c2*tauix+c2*tauiy-c3*tauiz;   //t2

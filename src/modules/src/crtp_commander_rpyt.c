@@ -23,6 +23,9 @@
  *
  *
  */
+#define DEBUG_MODULE "CRTP_COM_RPYT"
+#include <debug.h>
+
 #include <math.h>
 #include <stdbool.h>
 
@@ -127,6 +130,9 @@ void crtpCommanderRpytDecodeSetpoint(setpoint_t *setpoint, CRTPPacket *pk)
   if (values->thrust == 0) {
     thrustLocked = false;
   }
+  // if(values->thrust != 0){
+  //   DEBUG_PRINT("This is ctrp_commander_rpyt!\n");
+  // }
 
   // Thrust
   uint16_t rawThrust = values->thrust;
