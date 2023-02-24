@@ -6,6 +6,9 @@
 #include "attitude_controller.h"
 #include "position_controller.h"
 #include "controller_pid.h"
+// #include "controller_single_ppid.h"
+#include "single_qc_ppid.h"
+#include "motors.h"
 
 #include "log.h"
 #include "param.h"
@@ -180,6 +183,60 @@ void controllerPid(control_t *control, setpoint_t *setpoint,
     // DEBUG_PRINT("Current mode is gimbal thrust generator!\n");
     
     control->thrust = 30000;  // use to test switching mode
+  }
+}
+
+void controllerSinglePPIDInit(void)
+{
+  single_qc_ppid_initialize();
+}
+
+bool controllerSinglePPIDTest(void)
+{
+  return true;
+}
+
+void controllerSinglePPID(control_t *control, setpoint_t *setpoint,
+                                         const sensorData_t *sensors,
+                                         const state_t *state,
+                                         const uint32_t tick)
+{
+  single_qc_ppid_U.index = setpoint->attitude.roll;
+
+  single_qc_ppid_U.qw_op = setpoint->attitudeQuaternion.w;
+  single_qc_ppid_U.qx_op = setpoint->attitudeQuaternion.x;
+  single_qc_ppid_U.qy_op = setpoint->attitudeQuaternion.y;
+  single_qc_ppid_U.qz_op = setpoint->attitudeQuaternion.z;
+
+  single_qc_ppid_U.qw_IMU = state->attitudeQuaternion.w;
+  single_qc_ppid_U.qx_IMU = state->attitudeQuaternion.x;
+  single_qc_ppid_U.qy_IMU = state->attitudeQuaternion.y;
+  single_qc_ppid_U.qz_IMU = state->attitudeQuaternion.z;
+
+  single_qc_ppid_U.alpha_desired = setpoint->attitude.pitch;
+  single_qc_ppid_U.beta_desired = setpoint->attitude.yaw;
+
+  single_qc_ppid_U.omega_x = -sensors->gyro.y;
+  single_qc_ppid_U.beta_speed = sensors->gyro.x;
+  single_qc_ppid_U.omega_z = sensors->gyro.z;
+
+  single_qc_ppid_U.thrust = setpoint->thrust;
+
+  single_qc_ppid_step();
+
+  if (setpoint->thrust < 0.000898f)
+  {
+    motorsSetRatio(0, 0);
+    motorsSetRatio(1, 0);
+    motorsSetRatio(2, 0);
+    motorsSetRatio(3, 0);    
+  }
+  else
+  {
+    motorsSetRatio(0, single_qc_ppid_Y.m1);
+    motorsSetRatio(1, single_qc_ppid_Y.m2);
+    motorsSetRatio(2, single_qc_ppid_Y.m3);
+    motorsSetRatio(3, single_qc_ppid_Y.m4);  
   }
 }
 

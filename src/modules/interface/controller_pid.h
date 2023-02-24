@@ -35,4 +35,11 @@ void controllerPid(control_t *control, setpoint_t *setpoint,
                                          const state_t *state,
                                          const uint32_t tick);
 
+void controllerSinglePPIDInit(void);
+bool controllerSinglePPIDTest(void);
+void controllerSinglePPID(control_t *control, setpoint_t *setpoint,
+                                         const sensorData_t *sensors,
+                                         const state_t *state,
+                                         const uint32_t tick);
+
 #endif //__CONTROLLER_PID_H__
