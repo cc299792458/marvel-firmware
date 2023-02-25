@@ -10,7 +10,8 @@
 
 #include "autoconf.h"
 
-#define DEFAULT_CONTROLLER ControllerTypePID
+// #define DEFAULT_CONTROLLER ControllerTypePID
+#define DEFAULT_CONTROLLER ControllerTypeSinglePPID
 static ControllerType currentController = ControllerTypeAny;
 
 static void initController();
@@ -48,6 +49,8 @@ void controllerInit(ControllerType controller) {
     #define CONTROLLER ControllerTypeINDI
   #elif defined(CONFIG_CONTROLLER_MELLINGER)
     #define CONTROLLER ControllerTypeMellinger
+  #elif defined(CONFIG_CONTROLLER_SINGLE_PPID)
+    #define CONTROLLER ControllerTypeSinglePPID
   #else
     #define CONTROLLER ControllerTypeAny
   #endif

@@ -71,7 +71,7 @@ enum packet_type {
   hoverType         = 5,
   fullStateType     = 6,
   positionType      = 7,
-  twoDType          = 8,
+  twoDType          = 10,
 };
 
 /* ---===== 2 - Decoding functions =====--- */

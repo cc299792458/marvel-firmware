@@ -297,16 +297,18 @@ static void stabilizerTask(void* param)
       // we are ok to fly, or if the Crazyflie is in flight.
       //
       supervisorUpdate(&sensorData);
-
-      if (emergencyStop || (systemIsArmed() == false)) {
-        motorsStop();
-      } else {
-        powerDistribution(&motorPower, &control);
-        motorsSetRatio(MOTOR_M1, motorPower.m1);
-        motorsSetRatio(MOTOR_M2, motorPower.m2);
-        motorsSetRatio(MOTOR_M3, motorPower.m3);
-        motorsSetRatio(MOTOR_M4, motorPower.m4);
+      if(controllerType != ControllerTypeSinglePPID){
+          if (emergencyStop || (systemIsArmed() == false)) {
+            motorsStop();
+          } else {
+            powerDistribution(&motorPower, &control);
+            motorsSetRatio(MOTOR_M1, motorPower.m1);
+            motorsSetRatio(MOTOR_M2, motorPower.m2);
+            motorsSetRatio(MOTOR_M3, motorPower.m3);
+            motorsSetRatio(MOTOR_M4, motorPower.m4);
+          }    
       }
+      
 
 #ifdef CONFIG_DECK_USD
       // Log data to uSD card if configured

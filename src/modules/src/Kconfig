@@ -24,6 +24,11 @@ config CONTROLLER_MELLINGER
     help
         Use the Mellinger controller as default
 
+config CONTROLLER_SINGLE_PPID
+    bool "Single PPID controller"
+    help
+        Use the Single PPID controller as default
+
 endchoice
 
 config ESTIMATOR_KALMAN_ENABLE

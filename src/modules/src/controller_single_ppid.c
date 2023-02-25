@@ -32,7 +32,20 @@ void controllerSinglePPID(control_t *control, setpoint_t *setpoint,
                                          const state_t *state,
                                          const uint32_t tick)
 {
-  single_qc_ppid_U.index = setpoint->attitude.roll;
+  // DEBUG_PRINT("SinglePPID Controller Is Running\n");
+  // setpoint->attitude.yaw = 0.0f;           //test
+  
+  // setpoint->attitudeQuaternion.w = 1.0f;   //test
+  // setpoint->attitudeQuaternion.x = 0.0f;   //test
+  // setpoint->attitudeQuaternion.y = 0.0f;   //test
+  // setpoint->attitudeQuaternion.z = 0.0f;   //test
+
+  // setpoint->attitude.roll = 0.0f;          //test
+  // setpoint->attitude.pitch = 0.0f;         //test
+
+  // setpoint->thrust = 0.2f;                 //test
+
+  single_qc_ppid_U.index = setpoint->attitude.yaw;
 
   single_qc_ppid_U.qw_op = setpoint->attitudeQuaternion.w;
   single_qc_ppid_U.qx_op = setpoint->attitudeQuaternion.x;
@@ -44,17 +57,27 @@ void controllerSinglePPID(control_t *control, setpoint_t *setpoint,
   single_qc_ppid_U.qy_IMU = state->attitudeQuaternion.y;
   single_qc_ppid_U.qz_IMU = state->attitudeQuaternion.z;
 
-  single_qc_ppid_U.alpha_desired = setpoint->attitude.pitch;
-  single_qc_ppid_U.beta_desired = setpoint->attitude.yaw;
+  // single_qc_ppid_U.qw_IMU = 1.0f;   //test
+  // single_qc_ppid_U.qx_IMU = 0.0f;   //test
+  // single_qc_ppid_U.qy_IMU = 0.0f;   //test
+  // single_qc_ppid_U.qz_IMU = 0.0f;   //test
+
+  single_qc_ppid_U.alpha_desired = setpoint->attitude.roll;
+  single_qc_ppid_U.beta_desired = setpoint->attitude.pitch;
 
   single_qc_ppid_U.omega_x = -sensors->gyro.y;
   single_qc_ppid_U.beta_speed = sensors->gyro.x;
   single_qc_ppid_U.omega_z = sensors->gyro.z;
 
+  // single_qc_ppid_U.omega_x = 0.0f;     //test
+  // single_qc_ppid_U.beta_speed = 0.0f;  //test
+  // single_qc_ppid_U.omega_z = 0.0f;     //test
+
   single_qc_ppid_U.thrust = setpoint->thrust;
 
   single_qc_ppid_step();
-
+  
+  // DEBUG_PRINT("m1:%f, m2:%f, m3:%f, m4:%f\n", (double)single_qc_ppid_Y.m1, (double)single_qc_ppid_Y.m2, (double)single_qc_ppid_Y.m3, (double)single_qc_ppid_Y.m4);
   if (setpoint->thrust < 0.000898f)
   {
     motorsSetRatio(0, 0);
@@ -67,7 +90,7 @@ void controllerSinglePPID(control_t *control, setpoint_t *setpoint,
     motorsSetRatio(0, single_qc_ppid_Y.m1);
     motorsSetRatio(1, single_qc_ppid_Y.m2);
     motorsSetRatio(2, single_qc_ppid_Y.m3);
-    motorsSetRatio(3, single_qc_ppid_Y.m4);  
+    motorsSetRatio(3, single_qc_ppid_Y.m4);
   }
 }
 
