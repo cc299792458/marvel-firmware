@@ -6,7 +6,7 @@
 #include "controller_pid.h"
 #include "controller_mellinger.h"
 #include "controller_indi.h"
-// #include "controller_single_ppid.h"
+#include "controller_single_ppid.h"
 
 #include "autoconf.h"
 
