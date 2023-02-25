@@ -21,17 +21,17 @@ P_single_qc_ppid_T single_qc_ppid_P = {
   /* Variable: dgaina
    * Referenced by: '<S7>/dgain'
    */
-  0.4F,
+  1.0F,
 
   /* Variable: dgainas
    * Referenced by: '<S7>/dgain1'
    */
-  1.0E-6F,
+  3.0E-6F,
 
   /* Variable: dgainb
    * Referenced by: '<S8>/dgain'
    */
-  0.3F,
+  0.0F,
 
   /* Variable: dgainbs
    * Referenced by: '<S8>/dgain1'
@@ -41,12 +41,12 @@ P_single_qc_ppid_T single_qc_ppid_P = {
   /* Variable: igaina
    * Referenced by: '<S7>/igain'
    */
-  12.0F,
+  10.0F,
 
   /* Variable: igainas
    * Referenced by: '<S7>/igain1'
    */
-  2.0E-5F,
+  6.0E-5F,
 
   /* Variable: igainb
    * Referenced by: '<S8>/igain'
@@ -56,22 +56,22 @@ P_single_qc_ppid_T single_qc_ppid_P = {
   /* Variable: igainbs
    * Referenced by: '<S8>/igain1'
    */
-  7.0E-5F,
+  6.0E-5F,
 
   /* Variable: pgaina
    * Referenced by: '<S7>/pgain'
    */
-  850.0F,
+  1200.0F,
 
   /* Variable: pgainas
    * Referenced by: '<S7>/pgain1'
    */
-  2.33E-5F,
+  7.0E-5F,
 
   /* Variable: pgainb
    * Referenced by: '<S8>/pgain'
    */
-  500.0F,
+  1400.0F,
 
   /* Variable: pgainbs
    * Referenced by: '<S8>/pgain1'
