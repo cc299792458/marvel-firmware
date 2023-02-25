@@ -18,7 +18,8 @@
 
 
 void controllerSinglePPIDInit(void)
-{
+{ 
+  // DEBUG_PRINT("I have init!\n");
   single_qc_ppid_initialize();
 }
 
@@ -47,6 +48,13 @@ void controllerSinglePPID(control_t *control, setpoint_t *setpoint,
 
   single_qc_ppid_U.index = setpoint->attitude.yaw;
 
+  if(setpoint->attitudeQuaternion.w+setpoint->attitudeQuaternion.x+setpoint->attitudeQuaternion.y+setpoint->attitudeQuaternion.z==0.0f){
+    setpoint->attitudeQuaternion.w = 1.0f;   //test
+    setpoint->attitudeQuaternion.x = 0.0f;   //test
+    setpoint->attitudeQuaternion.y = 0.0f;   //test
+    setpoint->attitudeQuaternion.z = 0.0f;   //test
+    // DEBUG_PRINT("F\n");
+  }
   single_qc_ppid_U.qw_op = setpoint->attitudeQuaternion.w;
   single_qc_ppid_U.qx_op = setpoint->attitudeQuaternion.x;
   single_qc_ppid_U.qy_op = setpoint->attitudeQuaternion.y;
@@ -75,9 +83,12 @@ void controllerSinglePPID(control_t *control, setpoint_t *setpoint,
 
   single_qc_ppid_U.thrust = setpoint->thrust;
 
+  // Add a condition judgement here
+  // if (setpoint->thrust > 0){    
+  //   single_qc_ppid_step();
+  // }
   single_qc_ppid_step();
-  
-  // DEBUG_PRINT("m1:%f, m2:%f, m3:%f, m4:%f\n", (double)single_qc_ppid_Y.m1, (double)single_qc_ppid_Y.m2, (double)single_qc_ppid_Y.m3, (double)single_qc_ppid_Y.m4);
+
   if (setpoint->thrust < 0.000898f)
   {
     motorsSetRatio(0, 0);
