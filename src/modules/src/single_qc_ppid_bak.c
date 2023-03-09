@@ -502,7 +502,7 @@ void single_qc_ppid_step(void)
   /* End of Saturate: '<S6>/Saturation1' */
 
   /* MATLAB Function: '<Root>/MATLAB Function1' */
-  fty = fty / 4.0F / 0.047F;
+  fty = fty / 4.0F / 0.0566F;
 
   /* Product: '<S6>/Product1' */
   u0 = rtb_Sum1_d * ftz;
@@ -521,7 +521,7 @@ void single_qc_ppid_step(void)
   /* MATLAB Function: '<Root>/MATLAB Function1' incorporates:
    *  Constant: '<Root>/Constant'
    */
-  ftz = u0 / 4.0F / 0.047F * single_qc_ppid_P.torque_modifier;
+  ftz = u0 / 4.0F / 0.0566F * single_qc_ppid_P.torque_modifier;
   u0 = f3 + ftx;
   f0 = (u0 - fty) - ftz;
   f3 -= ftx;
