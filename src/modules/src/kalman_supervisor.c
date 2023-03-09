@@ -31,8 +31,8 @@
 #include "param.h"
 
 // The bounds on states, these shouldn't be hit...
-float maxPosition = 100; //meters
-float maxVelocity = 10; //meters per second
+float maxPosition = 100000; //meters, modified by Chi Chu, defualt is 100
+float maxVelocity = 100; //meters per second, modified by Chi Chu, defualt is 10
 
 bool kalmanSupervisorIsStateWithinBounds(const kalmanCoreData_t* this) {
   for (int i = 0; i < 3; i++) {
