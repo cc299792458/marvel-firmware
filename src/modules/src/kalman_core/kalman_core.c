@@ -65,7 +65,7 @@
 #include "static_mem.h"
 
 #include "lighthouse_calibration.h"
-// #define DEBUG_STATE_CHECK
+#define DEBUG_STATE_CHECK
 
 // the reversion of pitch and roll to zero
 #ifdef CONFIG_DECK_LOCO_2D_POSITION
