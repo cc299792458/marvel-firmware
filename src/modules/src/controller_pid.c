@@ -159,13 +159,6 @@ void controllerPid(control_t *control, setpoint_t *setpoint,
     // Reset the calculated YAW angle for rate control
     attitudeDesired.yaw = state->attitude.yaw;
   }    
-  // }
-  // else{
-  //   // add gimbal controller here.
-  //   // DEBUG_PRINT("Current mode is gimbal thrust generator!\n");
-    
-  //   control->thrust = 30000;  // use to test switching mode
-  // }
 }
 
 /**
