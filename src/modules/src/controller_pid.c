@@ -26,6 +26,9 @@ static float r_roll;
 static float r_pitch;
 static float r_yaw;
 static float accelz;
+static float vel_x;
+static float vel_y;
+static float vel_z;
 
 void controllerPidInit(void)
 {
@@ -226,5 +229,18 @@ LOG_ADD(LOG_FLOAT, pitchRate, &rateDesired.pitch)
  * @brief Desired yaw rate setpoint
  */
 LOG_ADD(LOG_FLOAT, yawRate,   &rateDesired.yaw)
+/**
+ * @brief Desired x vel setpoint
+ */
+LOG_ADD(LOG_FLOAT, vel_x,   &rateDesired.yaw)
+/**
+ * @brief Desired y vel setpoint
+ */
+LOG_ADD(LOG_FLOAT, vel_y,   &rateDesired.yaw)
+/**
+ * @brief Desired z vel setpoint
+ */
+LOG_ADD(LOG_FLOAT, vel_z,   &rateDesired.yaw)
+
 LOG_GROUP_STOP(controller)
 
