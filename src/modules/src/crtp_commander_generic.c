@@ -71,7 +71,8 @@ enum packet_type {
   hoverType         = 5,
   fullStateType     = 6,
   positionType      = 7,
-  twoDType          = 8,
+  attitudeType      = 8,
+  twoDType          = 10,
 };
 
 /* ---===== 2 - Decoding functions =====--- */
@@ -368,8 +369,37 @@ static void positionDecoder(setpoint_t *setpoint, uint8_t type, const void *data
   setpoint->attitude.yaw = values->yaw;
 }
 
+/* attitudeDecoder
+ * Set the Crazyflie thrust and roll/pitch angles
+ */
+struct attitudePacket_s {
+  float roll;            // deg
+  float pitch;           // ...
+  float yawrate;         // deg/s
+  uint16_t thrust;       // 10000~60000
+} __attribute__((packed));
+static void attitudeDecoder(setpoint_t *setpoint, uint8_t type, const void *data, size_t datalen)
+{
+  const struct attitudePacket_s *values = data;
+
+  ASSERT(datalen == sizeof(struct attitudePacket_s));
+
+  setpoint->mode.roll = modeAbs;
+  setpoint->mode.pitch = modeAbs;
+
+  setpoint->attitude.roll = values->roll;
+  setpoint->attitude.pitch = values->pitch;
+
+  setpoint->mode.yaw = modeVelocity;
+  setpoint->attitudeRate.yaw = -values->yawrate;
+
+  setpoint->mode.z = modeDisable;
+  setpoint->thrust = values->thrust;
+
+}
+
 /* twoDDecoder
- * Need to adjust
+ * index, base_q, alpha, beta, thrust
  */
  struct twoDPacket_s {
    uint8_t index;
@@ -397,16 +427,6 @@ static void twoDDecoder(setpoint_t *setpoint, uint8_t type, const void *data, si
 
   setpoint->thrust = values->thrust;
 
-  // setpoint->mode.x = modeAbs;
-  // setpoint->mode.y = modeAbs;
-  // setpoint->mode.z = modeAbs;
-
-  // setpoint->position.x = values->x;
-  // setpoint->position.y = values->y;
-  // setpoint->position.z = values->z;
-
-  // setpoint->mode.yaw = modeAbs;
-  // setpoint->attitude.yaw = values->yaw;
 }
 
  /* ---===== 3 - packetDecoders array =====--- */
@@ -419,6 +439,7 @@ const static packetDecoder_t packetDecoders[] = {
   [hoverType]         = hoverDecoder,
   [fullStateType]     = fullStateDecoder,
   [positionType]      = positionDecoder,
+  [attitudeType]      = attitudeDecoder,
   [twoDType]          = twoDDecoder,
 };
 

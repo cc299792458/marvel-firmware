@@ -74,10 +74,6 @@ bool controllerTest(void) {
 }
 
 void controller(control_t *control, setpoint_t *setpoint, const sensorData_t *sensors, const state_t *state, const uint32_t tick) {
-  // if(setpoint->thrust!=0){
-  //   DEBUG_PRINT("fly!\n");
-  // }
-  // controllerPid(control, setpoint, sensors, state, tick);
   controllerFunctions[currentController].update(control, setpoint, sensors, state, tick);
 }
 
