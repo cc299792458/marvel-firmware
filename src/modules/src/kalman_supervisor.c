@@ -31,7 +31,7 @@
 #include "param.h"
 
 // The bounds on states, these shouldn't be hit...
-float maxPosition = 100000; //meters, modified by Chi Chu, defualt is 100
+float maxPosition = 100; //meters, modified by Chi Chu, defualt is 100
 float maxVelocity = 100; //meters per second, modified by Chi Chu, defualt is 10
 // float maxVelocity = 0.0; //meters per second, add by Chi Chu, defualt is 10
 
