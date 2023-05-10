@@ -151,11 +151,11 @@ static struct this_s this = {
     .pid.dt = DT,
   },
   #ifdef IMPROVED_BARO_Z_HOLD
-    .thrustBase = 3800,    // modified by Chi Chu, used to be 38000
+    .thrustBase = 1000,    // modified by Chi Chu, used to be 38000
   #else
-    .thrustBase = 3600,    // modified by Chi Chu, used to be 36000
+    .thrustBase = 1000,    // modified by Chi Chu, used to be 36000
   #endif
-  .thrustMin  = 2000,      // modified by Chi Chu, used to be 20000
+  .thrustMin  = 1000,      // modified by Chi Chu, used to be 20000
 };
 #endif
 
