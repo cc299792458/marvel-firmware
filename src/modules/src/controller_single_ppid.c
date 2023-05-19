@@ -81,7 +81,9 @@ void controllerSinglePPID(control_t *control, setpoint_t *setpoint,
   // single_qc_ppid_U.beta_speed = 0.0f;  //test
   // single_qc_ppid_U.omega_z = 0.0f;     //test
 
-  single_qc_ppid_U.thrust = setpoint->thrust;
+  //0~65532 --> 0~24
+  single_qc_ppid_U.thrust = 4 * (2.508e-9F * setpoint->thrust * setpoint->thrust - 3.754e-6F * setpoint->thrust);
+  // single_qc_ppid_U.thrust = setpoint->thrust;
 
   // Add a condition judgement here
   // if (setpoint->thrust > 0){    
@@ -98,6 +100,10 @@ void controllerSinglePPID(control_t *control, setpoint_t *setpoint,
   }
   else
   {
+    DEBUG_PRINT("%f\n", (double)single_qc_ppid_Y.m1);
+    DEBUG_PRINT("%f\n", (double)single_qc_ppid_Y.m2);
+    DEBUG_PRINT("%f\n", (double)single_qc_ppid_Y.m3);
+    DEBUG_PRINT("%f\n", (double)single_qc_ppid_Y.m4);
     motorsSetRatio(0, single_qc_ppid_Y.m1);
     motorsSetRatio(1, single_qc_ppid_Y.m2);
     motorsSetRatio(2, single_qc_ppid_Y.m3);

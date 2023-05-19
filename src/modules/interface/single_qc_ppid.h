@@ -286,7 +286,7 @@ extern ExtY_single_qc_ppid_T single_qc_ppid_Y;
 
 /* Model entry point functions */
 extern void single_qc_ppid_initialize(void);
-extern void single_qc_ppid_step(void);
+extern int single_qc_ppid_step(void);
 extern void single_qc_ppid_terminate(void);
 
 /*-

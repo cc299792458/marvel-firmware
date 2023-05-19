@@ -76,7 +76,7 @@ real32_T rt_atan2f_snf(real32_T u0, real32_T u1)
 }
 
 /* Model step function */
-void single_qc_ppid_step(void)
+int single_qc_ppid_step(void)
 {
   real32_T acount_prev;
   real32_T bcount_prev;
@@ -117,7 +117,12 @@ void single_qc_ppid_step(void)
 
   real32_T tmp_0[4];
 
-  
+  // Use to debug munully
+  // single_qc_ppid_Y.m1 = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * single_qc_ppid_U.thrust/4.0F);
+  // single_qc_ppid_Y.m2 = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * single_qc_ppid_U.thrust/4.0F);
+  // single_qc_ppid_Y.m3 = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * single_qc_ppid_U.thrust/4.0F);
+  // single_qc_ppid_Y.m4 = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * single_qc_ppid_U.thrust/4.0F);
+  // return 0;
 
   /* Saturate: '<Root>/Saturation' incorporates:
    *  Inport: '<Root>/thrust'
@@ -490,7 +495,7 @@ void single_qc_ppid_step(void)
   /* End of Saturate: '<S6>/Saturation' */
 
   /* MATLAB Function: '<Root>/MATLAB Function1' */
-  ftx = u0 / 4.0F / 0.0556F;
+  ftx = u0 / 4.0F / 0.048F;
 
   /* Saturate: '<S6>/Saturation1' */
   if (rtb_Sum1_p > single_qc_ppid_P.sat_ty) {
@@ -504,7 +509,7 @@ void single_qc_ppid_step(void)
   /* End of Saturate: '<S6>/Saturation1' */
 
   /* MATLAB Function: '<Root>/MATLAB Function1' */
-  fty = fty / 4.0F / 0.0566F;
+  fty = fty / 4.0F / 0.048F;
 
   /* Product: '<S6>/Product1' */
   u0 = rtb_Sum1_d * ftz;
@@ -523,7 +528,7 @@ void single_qc_ppid_step(void)
   /* MATLAB Function: '<Root>/MATLAB Function1' incorporates:
    *  Constant: '<Root>/Constant'
    */
-  ftz = u0 / 4.0F / 0.0566F * single_qc_ppid_P.torque_modifier;
+  ftz = u0 / 4.0F / 0.047F * single_qc_ppid_P.torque_modifier;
   u0 = f3 + ftx;
   f0 = (u0 - fty) - ftz;
   f3 -= ftx;
@@ -546,18 +551,30 @@ void single_qc_ppid_step(void)
     f3 = 0.0F;
   }
 
-  q_Bbi[0] = f0 / 0.1472F * 65535.0F;
-  q_Bbi[1] = ftx / 0.1472F * 65535.0F;
-  q_Bbi[2] = f2 / 0.1472F * 65535.0F;
-  q_Bbi[3] = f3 / 0.1472F * 65535.0F;
- /* safety */
-//  if ((fabsf(single_qc_ppid_U.omega_x)>80.0F) || (fabsf(single_qc_ppid_U.beta_speed)>80.0F))
-//  {
-//    q_Bbi[0]=0.0F;
-//    q_Bbi[1]=0.0F;
-//    q_Bbi[2]=0.0F;
-//    q_Bbi[3]=0.0F;
-//  }
+  q_Bbi[0] = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * f0);
+  q_Bbi[1] = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * ftx);
+  q_Bbi[2] = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * f2);
+  q_Bbi[3] = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * f3);
+
+  // q_Bbi[0] = 748.4F + 1000.0F * sqrt(31.661F + 398.7F * f0);
+  // q_Bbi[1] = 748.4F + 1000.0F * sqrt(31.661F + 398.7F * ftx);
+  // q_Bbi[2] = 748.4F + 1000.0F * sqrt(31.661F + 398.7F * f2);
+  // q_Bbi[3] = 748.4F + 1000.0F * sqrt(31.661F + 398.7F * f3);
+
+  // Original
+  // q_Bbi[0] = f0 / 0.1472F * 65535.0F;
+  // q_Bbi[1] = ftx / 0.1472F * 65535.0F;
+  // q_Bbi[2] = f2 / 0.1472F * 65535.0F;
+  // q_Bbi[3] = f3 / 0.1472F * 65535.0F;
+ 
+  /* safety */
+  //  if ((fabsf(single_qc_ppid_U.omega_x)>80.0F) || (fabsf(single_qc_ppid_U.beta_speed)>80.0F))
+  //  {
+  //    q_Bbi[0]=0.0F;
+  //    q_Bbi[1]=0.0F;
+  //    q_Bbi[2]=0.0F;
+  //    q_Bbi[3]=0.0F;
+  //  }
 
   /* Saturate: '<Root>/Saturation1' */
   if (q_Bbi[0] > single_qc_ppid_P.Saturation1_UpperSat) {

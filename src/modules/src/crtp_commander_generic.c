@@ -425,6 +425,9 @@ static void twoDDecoder(setpoint_t *setpoint, uint8_t type, const void *data, si
   setpoint->attitude.roll = values->alpha;
   setpoint->attitude.pitch = values->beta;
 
+  //0~65532 --> 0~24
+  // trans_thrust = 4 * (2.508e-9F * values->thrust * values->thrust - 3.754e-6F * values->thrust);
+  // setpoint->thrust = trans_thrust;
   setpoint->thrust = values->thrust;
 
 }
