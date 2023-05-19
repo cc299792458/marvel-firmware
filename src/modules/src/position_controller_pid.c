@@ -89,8 +89,8 @@ float velZFiltCutoff = 20.0f;
 static struct this_s this = {
   .pidVX = {
     .pid = {
-        .kp = 0.0f,   // modified by Chi Chu, used to be 25.0f
-        .ki = 0.0f,    // modified by Chi Chu, used to be 1.0f
+        .kp = 25.0f,   // modified by Chi Chu, used to be 25.0f
+        .ki = 1.0f,    // modified by Chi Chu, used to be 1.0f
         .kd = 0.0f,    // modified by Chi Chu, used to be 0.0f
     },
     .pid.dt = DT,
@@ -98,8 +98,8 @@ static struct this_s this = {
 
   .pidVY = {
     .pid = {
-      .kp = 0.0f,   // modified by Chi Chu, used to be 25.0f
-      .ki = 0.0f,    // modified by Chi Chu, used to be 1.0f
+      .kp = 25.0f,   // modified by Chi Chu, used to be 25.0f
+      .ki = 1.0f,    // modified by Chi Chu, used to be 1.0f
       .kd = 0.0f,    // modified by Chi Chu, used to be 0.0f
     },
     .pid.dt = DT,
@@ -107,9 +107,9 @@ static struct this_s this = {
   #ifdef IMPROVED_BARO_Z_HOLD
     .pidVZ = {
       .pid = {
-        .kp = 0.0f,   // modified by Chi Chu, used to be 3.0f
-        .ki = 0.0f,   // modified by Chi Chu, used to be 1.0f
-        .kd = 0.0f,   //kd can be lowered for improved stability, but results in slower response time.
+        .kp = 3.0f,   // modified by Chi Chu, used to be 3.0f
+        .ki = 1.0f,   // modified by Chi Chu, used to be 1.0f
+        .kd = 1.5f,   //kd can be lowered for improved stability, but results in slower response time.
                       // modified by Chi Chu, used to be 1.5f
       },
       .pid.dt = DT,
@@ -117,8 +117,8 @@ static struct this_s this = {
   #else
     .pidVZ = {
       .pid = {
-        .kp = 0.0f,   // modified by Chi Chu, used to be 25.0f
-        .ki = 0.0f,   // modified by Chi Chu, used to be 15.0f
+        .kp = 25.0f,   // modified by Chi Chu, used to be 25.0f
+        .ki = 15.0f,   // modified by Chi Chu, used to be 15.0f
         .kd = 0.0f,   // modified by Chi Chu, used to be 0
       },
       .pid.dt = DT,
@@ -126,7 +126,7 @@ static struct this_s this = {
   #endif
   .pidX = {
     .pid = {
-      .kp = 0.0f,   // modified by Chi Chu, used to be 2.0f
+      .kp = 2.0f,   // modified by Chi Chu, used to be 2.0f
       .ki = 0.0f,   // modified by Chi Chu, used to be 0.0f
       .kd = 0.0f,   // modified by Chi Chu, used to be 0.0f
     },
@@ -135,7 +135,7 @@ static struct this_s this = {
 
   .pidY = {
     .pid = {
-      .kp = 0.0f,   // modified by Chi Chu, used to be 2.0f
+      .kp = 2.0f,   // modified by Chi Chu, used to be 2.0f
       .ki = 0.0f,   // modified by Chi Chu, used to be 0.0f
       .kd = 0.0f,   // modified by Chi Chu, used to be 0.0f
     },
@@ -144,18 +144,18 @@ static struct this_s this = {
 
   .pidZ = {
     .pid = {
-      .kp = 0.0f,   // modified by Chi Chu, used to be 2.0f
-      .ki = 0.0f,   // modified by Chi Chu, used to be 0.5f
+      .kp = 2.0f,   // modified by Chi Chu, used to be 2.0f
+      .ki = 0.5f,   // modified by Chi Chu, used to be 0.5f
       .kd = 0.0f,   // modified by Chi Chu, used to be 0.0f
     },
     .pid.dt = DT,
   },
   #ifdef IMPROVED_BARO_Z_HOLD
-    .thrustBase = 3800,    // modified by Chi Chu, used to be 38000
+    .thrustBase = 38000,    // modified by Chi Chu, used to be 38000
   #else
-    .thrustBase = 3600,    // modified by Chi Chu, used to be 36000
+    .thrustBase = 36000,    // modified by Chi Chu, used to be 36000
   #endif
-  .thrustMin  = 2000,      // modified by Chi Chu, used to be 20000
+  .thrustMin  = 20000,      // modified by Chi Chu, used to be 20000
 };
 #endif
 
