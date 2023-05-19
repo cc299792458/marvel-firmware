@@ -488,7 +488,7 @@ void single_qc_ppid_step(void)
   /* End of Saturate: '<S6>/Saturation' */
 
   /* MATLAB Function: '<Root>/MATLAB Function1' */
-  ftx = u0 / 4.0F / 0.0556F;
+  ftx = u0 / 4.0F / 0.048F;
 
   /* Saturate: '<S6>/Saturation1' */
   if (rtb_Sum1_p > single_qc_ppid_P.sat_ty) {
@@ -502,7 +502,7 @@ void single_qc_ppid_step(void)
   /* End of Saturate: '<S6>/Saturation1' */
 
   /* MATLAB Function: '<Root>/MATLAB Function1' */
-  fty = fty / 4.0F / 0.047F;
+  fty = fty / 4.0F / 0.048F;
 
   /* Product: '<S6>/Product1' */
   u0 = rtb_Sum1_d * ftz;
@@ -544,18 +544,26 @@ void single_qc_ppid_step(void)
     f3 = 0.0F;
   }
 
-  q_Bbi[0] = f0 / 0.1472F * 65535.0F;
-  q_Bbi[1] = ftx / 0.1472F * 65535.0F;
-  q_Bbi[2] = f2 / 0.1472F * 65535.0F;
-  q_Bbi[3] = f3 / 0.1472F * 65535.0F;
- /* safety */
-//  if ((fabsf(single_qc_ppid_U.omega_x)>80.0F) || (fabsf(single_qc_ppid_U.beta_speed)>80.0F))
-//  {
-//    q_Bbi[0]=0.0F;
-//    q_Bbi[1]=0.0F;
-//    q_Bbi[2]=0.0F;
-//    q_Bbi[3]=0.0F;
-//  }
+
+  q_Bbi[0] = 748.4F + 1000.0F * sqrt(31.661F + 398.7F * f0);
+  q_Bbi[1] = 748.4F + 1000.0F * sqrt(31.661F + 398.7F * ftx);
+  q_Bbi[2] = 748.4F + 1000.0F * sqrt(31.661F + 398.7F * f2);
+  q_Bbi[3] = 748.4F + 1000.0F * sqrt(31.661F + 398.7F * f3);
+
+  // Original
+  // q_Bbi[0] = f0 / 0.1472F * 65535.0F;
+  // q_Bbi[1] = ftx / 0.1472F * 65535.0F;
+  // q_Bbi[2] = f2 / 0.1472F * 65535.0F;
+  // q_Bbi[3] = f3 / 0.1472F * 65535.0F;
+ 
+  /* safety */
+  //  if ((fabsf(single_qc_ppid_U.omega_x)>80.0F) || (fabsf(single_qc_ppid_U.beta_speed)>80.0F))
+  //  {
+  //    q_Bbi[0]=0.0F;
+  //    q_Bbi[1]=0.0F;
+  //    q_Bbi[2]=0.0F;
+  //    q_Bbi[3]=0.0F;
+  //  }
 
   /* Saturate: '<Root>/Saturation1' */
   if (q_Bbi[0] > single_qc_ppid_P.Saturation1_UpperSat) {

@@ -96,8 +96,7 @@ P_single_qc_ppid_T single_qc_ppid_P = {
   /* Variable: torque_modifier
    * Referenced by: '<Root>/Constant'
    */
-  // 0.048/0.01012
-  4.7431F,
+  9.4894F,
 
   /* Mask Parameter: DiscreteDerivative2_ICPrevScale
    * Referenced by: '<S11>/UD'
@@ -137,8 +136,7 @@ P_single_qc_ppid_T single_qc_ppid_P = {
   /* Computed Parameter: Saturation_UpperSat
    * Referenced by: '<Root>/Saturation'
    */
-
-  24.0F,
+  0.7F,
 
   /* Computed Parameter: Saturation_LowerSat
    * Referenced by: '<Root>/Saturation'
