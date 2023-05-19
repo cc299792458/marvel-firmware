@@ -46,7 +46,7 @@ void controllerSinglePPID(control_t *control, setpoint_t *setpoint,
 
   // setpoint->thrust = 0.2f;                 //test
 
-  single_qc_ppid_U.index = setpoint->attitude.yaw;
+  ex_input.index = setpoint->attitude.yaw;
 
   if(setpoint->attitudeQuaternion.w+setpoint->attitudeQuaternion.x+setpoint->attitudeQuaternion.y+setpoint->attitudeQuaternion.z==0.0f){
     setpoint->attitudeQuaternion.w = 1.0f;   //test
@@ -55,35 +55,35 @@ void controllerSinglePPID(control_t *control, setpoint_t *setpoint,
     setpoint->attitudeQuaternion.z = 0.0f;   //test
     // DEBUG_PRINT("F\n");
   }
-  single_qc_ppid_U.qw_op = setpoint->attitudeQuaternion.w;
-  single_qc_ppid_U.qx_op = setpoint->attitudeQuaternion.x;
-  single_qc_ppid_U.qy_op = setpoint->attitudeQuaternion.y;
-  single_qc_ppid_U.qz_op = setpoint->attitudeQuaternion.z;
+  ex_input.qw_op = setpoint->attitudeQuaternion.w;
+  ex_input.qx_op = setpoint->attitudeQuaternion.x;
+  ex_input.qy_op = setpoint->attitudeQuaternion.y;
+  ex_input.qz_op = setpoint->attitudeQuaternion.z;
 
-  single_qc_ppid_U.qw_IMU = state->attitudeQuaternion.w;
-  single_qc_ppid_U.qx_IMU = state->attitudeQuaternion.x;
-  single_qc_ppid_U.qy_IMU = state->attitudeQuaternion.y;
-  single_qc_ppid_U.qz_IMU = state->attitudeQuaternion.z;
+  ex_input.qw_IMU = state->attitudeQuaternion.w;
+  ex_input.qx_IMU = state->attitudeQuaternion.x;
+  ex_input.qy_IMU = state->attitudeQuaternion.y;
+  ex_input.qz_IMU = state->attitudeQuaternion.z;
 
-  // single_qc_ppid_U.qw_IMU = 1.0f;   //test
-  // single_qc_ppid_U.qx_IMU = 0.0f;   //test
-  // single_qc_ppid_U.qy_IMU = 0.0f;   //test
-  // single_qc_ppid_U.qz_IMU = 0.0f;   //test
+  // ex_input.qw_IMU = 1.0f;   //test
+  // ex_input.qx_IMU = 0.0f;   //test
+  // ex_input.qy_IMU = 0.0f;   //test
+  // ex_input.qz_IMU = 0.0f;   //test
 
-  single_qc_ppid_U.alpha_desired = setpoint->attitude.roll;
-  single_qc_ppid_U.beta_desired = setpoint->attitude.pitch;
+  ex_input.alpha_desired = setpoint->attitude.roll;
+  ex_input.beta_desired = setpoint->attitude.pitch;
 
-  single_qc_ppid_U.omega_x = -sensors->gyro.y;
-  single_qc_ppid_U.beta_speed = sensors->gyro.x;
-  single_qc_ppid_U.omega_z = sensors->gyro.z;
+  ex_input.omega_x = -sensors->gyro.y;
+  ex_input.beta_speed = sensors->gyro.x;
+  ex_input.omega_z = sensors->gyro.z;
 
-  // single_qc_ppid_U.omega_x = 0.0f;     //test
-  // single_qc_ppid_U.beta_speed = 0.0f;  //test
-  // single_qc_ppid_U.omega_z = 0.0f;     //test
+  // ex_input.omega_x = 0.0f;     //test
+  // ex_input.beta_speed = 0.0f;  //test
+  // ex_input.omega_z = 0.0f;     //test
 
   //0~65532 --> 0~24
-  single_qc_ppid_U.thrust = 4 * (2.508e-9F * setpoint->thrust * setpoint->thrust - 3.754e-6F * setpoint->thrust);
-  // single_qc_ppid_U.thrust = setpoint->thrust;
+  ex_input.thrust = 4 * (2.508e-9F * setpoint->thrust * setpoint->thrust - 3.754e-6F * setpoint->thrust);
+  // ex_input.thrust = setpoint->thrust;
 
   // Add a condition judgement here
   // if (setpoint->thrust > 0){    
@@ -100,14 +100,14 @@ void controllerSinglePPID(control_t *control, setpoint_t *setpoint,
   }
   else
   {
-    DEBUG_PRINT("%f\n", (double)single_qc_ppid_Y.m1);
-    DEBUG_PRINT("%f\n", (double)single_qc_ppid_Y.m2);
-    DEBUG_PRINT("%f\n", (double)single_qc_ppid_Y.m3);
-    DEBUG_PRINT("%f\n", (double)single_qc_ppid_Y.m4);
-    motorsSetRatio(0, single_qc_ppid_Y.m1);
-    motorsSetRatio(1, single_qc_ppid_Y.m2);
-    motorsSetRatio(2, single_qc_ppid_Y.m3);
-    motorsSetRatio(3, single_qc_ppid_Y.m4);
+    // DEBUG_PRINT("%f\n", (double)ex_output.m1);
+    // DEBUG_PRINT("%f\n", (double)ex_output.m2);
+    // DEBUG_PRINT("%f\n", (double)ex_output.m3);
+    // DEBUG_PRINT("%f\n", (double)ex_output.m4);
+    motorsSetRatio(0, ex_output.m1);
+    motorsSetRatio(1, ex_output.m2);
+    motorsSetRatio(2, ex_output.m3);
+    motorsSetRatio(3, ex_output.m4);
   }
 }
 
@@ -117,26 +117,26 @@ void controllerSinglePPID(control_t *control, setpoint_t *setpoint,
 
 LOG_GROUP_START(sctrl_ppid)
 
-LOG_ADD(LOG_FLOAT, e_alpha, &single_qc_ppid_Y.error_alpha)
-LOG_ADD(LOG_FLOAT, e_beta, &single_qc_ppid_Y.error_beta)
-LOG_ADD(LOG_FLOAT, e_alphas, &single_qc_ppid_Y.error_alphas)
-LOG_ADD(LOG_FLOAT, e_betas, &single_qc_ppid_Y.error_betas)
-LOG_ADD(LOG_FLOAT, u_alpha, &single_qc_ppid_Y.u_alpha)
-LOG_ADD(LOG_FLOAT, u_beta, &single_qc_ppid_Y.u_beta)
+LOG_ADD(LOG_FLOAT, e_alpha, &ex_output.error_alpha)
+LOG_ADD(LOG_FLOAT, e_beta, &ex_output.error_beta)
+LOG_ADD(LOG_FLOAT, e_alphas, &ex_output.error_alphas)
+LOG_ADD(LOG_FLOAT, e_betas, &ex_output.error_betas)
+LOG_ADD(LOG_FLOAT, u_alpha, &ex_output.u_alpha)
+LOG_ADD(LOG_FLOAT, u_beta, &ex_output.u_beta)
 
-LOG_ADD(LOG_FLOAT, t_be, &single_qc_ppid_Y.t_betae)
-LOG_ADD(LOG_FLOAT, t_bin, &single_qc_ppid_Y.t_betain)
-LOG_ADD(LOG_FLOAT, t_ae, &single_qc_ppid_Y.t_alphae)
-LOG_ADD(LOG_FLOAT, t_ain, &single_qc_ppid_Y.t_alphain)
+LOG_ADD(LOG_FLOAT, t_be, &ex_output.t_betae)
+LOG_ADD(LOG_FLOAT, t_bin, &ex_output.t_betain)
+LOG_ADD(LOG_FLOAT, t_ae, &ex_output.t_alphae)
+LOG_ADD(LOG_FLOAT, t_ain, &ex_output.t_alphain)
 
-LOG_ADD(LOG_FLOAT, x_gyro, &single_qc_ppid_U.omega_x)
-LOG_ADD(LOG_FLOAT, b_gyro, &single_qc_ppid_U.beta_speed)
-LOG_ADD(LOG_FLOAT, z_gyro, &single_qc_ppid_U.omega_z)
+LOG_ADD(LOG_FLOAT, x_gyro, &ex_input.omega_x)
+LOG_ADD(LOG_FLOAT, b_gyro, &ex_input.beta_speed)
+LOG_ADD(LOG_FLOAT, z_gyro, &ex_input.omega_z)
 
-LOG_ADD(LOG_FLOAT, t_m1, &single_qc_ppid_Y.t_m1)
-LOG_ADD(LOG_FLOAT, t_m2, &single_qc_ppid_Y.t_m2)
-LOG_ADD(LOG_FLOAT, t_m3, &single_qc_ppid_Y.t_m3)
-LOG_ADD(LOG_FLOAT, t_m4, &single_qc_ppid_Y.t_m4)
+LOG_ADD(LOG_FLOAT, t_m1, &ex_output.t_m1)
+LOG_ADD(LOG_FLOAT, t_m2, &ex_output.t_m2)
+LOG_ADD(LOG_FLOAT, t_m3, &ex_output.t_m3)
+LOG_ADD(LOG_FLOAT, t_m4, &ex_output.t_m4)
 
 LOG_GROUP_STOP(sctrl_ppid)
 

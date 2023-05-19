@@ -276,13 +276,13 @@ struct P_single_qc_ppid_T_ {
 extern P_single_qc_ppid_T single_qc_ppid_P;
 
 /* Block states (default storage) */
-extern DW_single_qc_ppid_T single_qc_ppid_DW;
+extern DW_single_qc_ppid_T memory_block;
 
 /* External inputs (root inport signals with default storage) */
-extern ExtU_single_qc_ppid_T single_qc_ppid_U;
+extern ExtU_single_qc_ppid_T ex_input;
 
 /* External outputs (root outports fed by signals with default storage) */
-extern ExtY_single_qc_ppid_T single_qc_ppid_Y;
+extern ExtY_single_qc_ppid_T ex_output;
 
 /* Model entry point functions */
 extern void single_qc_ppid_initialize(void);

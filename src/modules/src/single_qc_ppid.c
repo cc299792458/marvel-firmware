@@ -11,19 +11,22 @@
  * Embedded hardware selection: Intel->x86-64 (Windows64)
  * Code generation objective: Execution efficiency
  * Validation result: Not run
+ * 
+ * Note: This has been tidy up by Chu Chi on May 21 2023, to a more human-friendly coding style.
  */
+
 
 #include "single_qc_ppid.h"
 #include "single_qc_ppid_private.h"
 
 /* Block states (default storage) */
-DW_single_qc_ppid_T single_qc_ppid_DW;  // Memory Block
+DW_single_qc_ppid_T memory_block;  // Memory Block
 
 /* External inputs (root inport signals with default storage) */
-ExtU_single_qc_ppid_T single_qc_ppid_U;   // Input
+ExtU_single_qc_ppid_T ex_input;   // Input
 
 /* External outputs (root outports fed by signals with default storage) */
-ExtY_single_qc_ppid_T single_qc_ppid_Y;   // Output
+ExtY_single_qc_ppid_T ex_output;   // Output
 
 /* Forward declaration for local functions */
 static void single_qc_ppid_quatmultiply(const real32_T q[4], const real32_T r[4],
@@ -117,24 +120,24 @@ int single_qc_ppid_step(void)
 
   real32_T tmp_0[4];
 
-  // // Use to debug munully
-  // single_qc_ppid_Y.m1 = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * single_qc_ppid_U.thrust/4.0F);
-  // single_qc_ppid_Y.m2 = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * single_qc_ppid_U.thrust/4.0F);
-  // single_qc_ppid_Y.m3 = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * single_qc_ppid_U.thrust/4.0F);
-  // single_qc_ppid_Y.m4 = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * single_qc_ppid_U.thrust/4.0F);
-  // return 0;
+  // Use to debug munully
+  ex_output.m1 = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * ex_input.thrust/4.0F);
+  ex_output.m2 = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * ex_input.thrust/4.0F);
+  ex_output.m3 = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * ex_input.thrust/4.0F);
+  ex_output.m4 = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * ex_input.thrust/4.0F);
+  return 0;
 
 
   /**********Input Bound**********/
   /* Saturate: '<Root>/Saturation' incorporates:
    *  Inport: '<Root>/thrust'
    */
-  if (single_qc_ppid_U.thrust > single_qc_ppid_P.Saturation_UpperSat) {
+  if (ex_input.thrust > single_qc_ppid_P.Saturation_UpperSat) {
     rtb_Saturation = single_qc_ppid_P.Saturation_UpperSat;
-  } else if (single_qc_ppid_U.thrust < single_qc_ppid_P.Saturation_LowerSat) {
+  } else if (ex_input.thrust < single_qc_ppid_P.Saturation_LowerSat) {
     rtb_Saturation = single_qc_ppid_P.Saturation_LowerSat;
   } else {
-    rtb_Saturation = single_qc_ppid_U.thrust;
+    rtb_Saturation = ex_input.thrust;
   }
   /* End of Saturate: '<Root>/Saturation' */
   /**********End of Input Bound**********/
@@ -163,29 +166,29 @@ int single_qc_ppid_step(void)
    *  RelationalOperator: '<S1>/Compare'
    *  RelationalOperator: '<S2>/Compare'
    */
-  acount_prev = single_qc_ppid_DW.Memory2_PreviousInput;
-  bcount_prev = single_qc_ppid_DW.Memory3_PreviousInput;
-  q_Bbi_tmp = -single_qc_ppid_U.index * 3.14159274F / 4.0F;
+  acount_prev = memory_block.Memory2_PreviousInput;
+  bcount_prev = memory_block.Memory3_PreviousInput;
+  q_Bbi_tmp = -ex_input.index * 3.14159274F / 4.0F;
   q_Bbi_tmp_0 = cosf(q_Bbi_tmp);
   q_Bbi[0] = q_Bbi_tmp_0;
   q_Bbi[1] = 0.0F;
   q_Bbi[2] = 0.0F;
   q_Bbi_tmp = sinf(q_Bbi_tmp);
   q_Bbi[3] = q_Bbi_tmp;
-  tmp[0] = single_qc_ppid_U.qw_op;
-  tmp[1] = single_qc_ppid_U.qx_op;
-  tmp[2] = single_qc_ppid_U.qy_op;
-  tmp[3] = single_qc_ppid_U.qz_op;
+  tmp[0] = ex_input.qw_op;
+  tmp[1] = ex_input.qx_op;
+  tmp[2] = ex_input.qy_op;
+  tmp[3] = ex_input.qz_op;
   q_bi[0] = -q_Bbi_tmp_0;
   q_bi[1] = 0.0F;
   q_bi[2] = 0.0F;
   q_bi[3] = q_Bbi_tmp;
   single_qc_ppid_quatmultiply(tmp, q_bi, tmp_0);
   single_qc_ppid_quatmultiply(q_Bbi, tmp_0, q_bi);
-  tmp[0] = single_qc_ppid_U.qw_IMU;
-  tmp[1] = single_qc_ppid_U.qx_IMU;
-  tmp[2] = single_qc_ppid_U.qy_IMU;
-  tmp[3] = single_qc_ppid_U.qz_IMU;
+  tmp[0] = ex_input.qw_IMU;
+  tmp[1] = ex_input.qx_IMU;
+  tmp[2] = ex_input.qy_IMU;
+  tmp[3] = ex_input.qz_IMU;
   q_Bbi[0] = -q_bi[0];
   q_Bbi[1] = q_bi[1];
   q_Bbi[2] = q_bi[2];
@@ -228,14 +231,14 @@ int single_qc_ppid_step(void)
 
   q_Bbi_tmp = rt_atan2f_snf(R_bii[5], R_bii[4]);
   q_Bbi_tmp_0 = rt_atan2f_snf(R_bii[6], R_bii[0]);
-  if ((single_qc_ppid_DW.Memory4_PreviousInput <=
+  if ((memory_block.Memory4_PreviousInput <=
        single_qc_ppid_P.Constant_Value_k) && (rtb_Saturation >
        single_qc_ppid_P.Constant_Value)) {
     acount_prev = 0.0F;
     bcount_prev = 0.0F;
   }
 
-  diff_a = single_qc_ppid_DW.Memory_PreviousInput - q_Bbi_tmp;
+  diff_a = memory_block.Memory_PreviousInput - q_Bbi_tmp;
   if (fabsf(diff_a) > 3.14159274F) {
     if (diff_a < 0.0F) {
       diff_a = -1.0F;
@@ -251,7 +254,7 @@ int single_qc_ppid_step(void)
   }
 
   diff_a = 6.28318548F * acount_prev + q_Bbi_tmp;
-  diff_b = single_qc_ppid_DW.Memory1_PreviousInput - q_Bbi_tmp_0;
+  diff_b = memory_block.Memory1_PreviousInput - q_Bbi_tmp_0;
   if (fabsf(diff_b) > 3.14159274F) {
     if (diff_b < 0.0F) {
       diff_b = -1.0F;
@@ -274,7 +277,7 @@ int single_qc_ppid_step(void)
   /* Sum: '<S6>/Sum' incorporates:
    *  Inport: '<Root>/alpha_desired'
    */
-  rtb_Sum = single_qc_ppid_U.alpha_desired - diff_a;  
+  rtb_Sum = ex_input.alpha_desired - diff_a;  
 
   /* RelationalOperator: '<S9>/Compare' incorporates:
    *  Constant: '<S9>/Constant'
@@ -282,20 +285,20 @@ int single_qc_ppid_step(void)
   rtb_Compare_h = (rtb_Saturation > single_qc_ppid_P.Constant_Value_a);
 
   /* DiscreteIntegrator: '<S7>/Discrete-Time Integrator2' */
-  if (rtb_Compare_h && (single_qc_ppid_DW.DiscreteTimeIntegrator2_PrevRes <= 0))
+  if (rtb_Compare_h && (memory_block.DiscreteTimeIntegrator2_PrevRes <= 0))
   {
-    single_qc_ppid_DW.DiscreteTimeIntegrator2_DSTATE =
+    memory_block.DiscreteTimeIntegrator2_DSTATE =
       single_qc_ppid_P.DiscreteTimeIntegrator2_IC;
   }
 
-  if (single_qc_ppid_DW.DiscreteTimeIntegrator2_DSTATE >=
+  if (memory_block.DiscreteTimeIntegrator2_DSTATE >=
       single_qc_ppid_P.DiscreteTimeIntegrator2_UpperSa) {
-    single_qc_ppid_DW.DiscreteTimeIntegrator2_DSTATE =
+    memory_block.DiscreteTimeIntegrator2_DSTATE =
       single_qc_ppid_P.DiscreteTimeIntegrator2_UpperSa;
   } else {
-    if (single_qc_ppid_DW.DiscreteTimeIntegrator2_DSTATE <=
+    if (memory_block.DiscreteTimeIntegrator2_DSTATE <=
         single_qc_ppid_P.DiscreteTimeIntegrator2_LowerSa) {
-      single_qc_ppid_DW.DiscreteTimeIntegrator2_DSTATE =
+      memory_block.DiscreteTimeIntegrator2_DSTATE =
         single_qc_ppid_P.DiscreteTimeIntegrator2_LowerSa;
     }
   }
@@ -335,25 +338,25 @@ int single_qc_ppid_step(void)
    *  Store in Global RAM
    */
   rtb_Sum3 = ((single_qc_ppid_P.pgaina * rtb_Sum + single_qc_ppid_P.igaina *
-               single_qc_ppid_DW.DiscreteTimeIntegrator2_DSTATE) + (rtb_TSamp -
-    single_qc_ppid_DW.UD_DSTATE) * single_qc_ppid_P.dgaina) - (fty *
-    single_qc_ppid_U.omega_x + ftz * single_qc_ppid_U.omega_z);
+               memory_block.DiscreteTimeIntegrator2_DSTATE) + (rtb_TSamp -
+    memory_block.UD_DSTATE) * single_qc_ppid_P.dgaina) - (fty *
+    ex_input.omega_x + ftz * ex_input.omega_z);
 
   /* DiscreteIntegrator: '<S7>/Discrete-Time Integrator1' */
-  if (rtb_Compare_h && (single_qc_ppid_DW.DiscreteTimeIntegrator1_PrevRes <= 0))
+  if (rtb_Compare_h && (memory_block.DiscreteTimeIntegrator1_PrevRes <= 0))
   {
-    single_qc_ppid_DW.DiscreteTimeIntegrator1_DSTATE =
+    memory_block.DiscreteTimeIntegrator1_DSTATE =
       single_qc_ppid_P.DiscreteTimeIntegrator1_IC;
   }
 
-  if (single_qc_ppid_DW.DiscreteTimeIntegrator1_DSTATE >=
+  if (memory_block.DiscreteTimeIntegrator1_DSTATE >=
       single_qc_ppid_P.DiscreteTimeIntegrator1_UpperSa) {
-    single_qc_ppid_DW.DiscreteTimeIntegrator1_DSTATE =
+    memory_block.DiscreteTimeIntegrator1_DSTATE =
       single_qc_ppid_P.DiscreteTimeIntegrator1_UpperSa;
   } else {
-    if (single_qc_ppid_DW.DiscreteTimeIntegrator1_DSTATE <=
+    if (memory_block.DiscreteTimeIntegrator1_DSTATE <=
         single_qc_ppid_P.DiscreteTimeIntegrator1_LowerSa) {
-      single_qc_ppid_DW.DiscreteTimeIntegrator1_DSTATE =
+      memory_block.DiscreteTimeIntegrator1_DSTATE =
         single_qc_ppid_P.DiscreteTimeIntegrator1_LowerSa;
     }
   }
@@ -382,29 +385,29 @@ int single_qc_ppid_step(void)
    *  Store in Global RAM
    */
   rtb_Sum1_d = (single_qc_ppid_P.pgainas * rtb_Sum3 + single_qc_ppid_P.igainas *
-                single_qc_ppid_DW.DiscreteTimeIntegrator1_DSTATE) +
-    (rtb_TSamp_p2 - single_qc_ppid_DW.UD_DSTATE_j) * single_qc_ppid_P.dgainas;
+                memory_block.DiscreteTimeIntegrator1_DSTATE) +
+    (rtb_TSamp_p2 - memory_block.UD_DSTATE_j) * single_qc_ppid_P.dgainas;
 
   /* Sum: '<S6>/Sum1' incorporates:
    *  Inport: '<Root>/beta_desired'
    */
-  rtb_Sum1 = single_qc_ppid_U.beta_desired - diff_b;
+  rtb_Sum1 = ex_input.beta_desired - diff_b;
 
   /* DiscreteIntegrator: '<S8>/Discrete-Time Integrator2' */
   if ((rtb_Saturation > 0.0F) &&
-      (single_qc_ppid_DW.DiscreteTimeIntegrator2_PrevR_e <= 0)) {
-    single_qc_ppid_DW.DiscreteTimeIntegrator2_DSTAT_o =
+      (memory_block.DiscreteTimeIntegrator2_PrevR_e <= 0)) {
+    memory_block.DiscreteTimeIntegrator2_DSTAT_o =
       single_qc_ppid_P.DiscreteTimeIntegrator2_IC_h;
   }
 
-  if (single_qc_ppid_DW.DiscreteTimeIntegrator2_DSTAT_o >=
+  if (memory_block.DiscreteTimeIntegrator2_DSTAT_o >=
       single_qc_ppid_P.DiscreteTimeIntegrator2_Upper_l) {
-    single_qc_ppid_DW.DiscreteTimeIntegrator2_DSTAT_o =
+    memory_block.DiscreteTimeIntegrator2_DSTAT_o =
       single_qc_ppid_P.DiscreteTimeIntegrator2_Upper_l;
   } else {
-    if (single_qc_ppid_DW.DiscreteTimeIntegrator2_DSTAT_o <=
+    if (memory_block.DiscreteTimeIntegrator2_DSTAT_o <=
         single_qc_ppid_P.DiscreteTimeIntegrator2_Lower_i) {
-      single_qc_ppid_DW.DiscreteTimeIntegrator2_DSTAT_o =
+      memory_block.DiscreteTimeIntegrator2_DSTAT_o =
         single_qc_ppid_P.DiscreteTimeIntegrator2_Lower_i;
     }
   }
@@ -435,25 +438,25 @@ int single_qc_ppid_step(void)
    *  Store in Global RAM
    */
   rtb_Sum3_b = ((single_qc_ppid_P.pgainb * rtb_Sum1 + single_qc_ppid_P.igainb *
-                 single_qc_ppid_DW.DiscreteTimeIntegrator2_DSTAT_o) +
-                (rtb_TSamp_c - single_qc_ppid_DW.UD_DSTATE_p) *
-                single_qc_ppid_P.dgainb) - single_qc_ppid_U.beta_speed;
+                 memory_block.DiscreteTimeIntegrator2_DSTAT_o) +
+                (rtb_TSamp_c - memory_block.UD_DSTATE_p) *
+                single_qc_ppid_P.dgainb) - ex_input.beta_speed;
 
   /* DiscreteIntegrator: '<S8>/Discrete-Time Integrator1' */
   if ((rtb_Saturation > 0.0F) &&
-      (single_qc_ppid_DW.DiscreteTimeIntegrator1_PrevR_o <= 0)) {
-    single_qc_ppid_DW.DiscreteTimeIntegrator1_DSTAT_p =
+      (memory_block.DiscreteTimeIntegrator1_PrevR_o <= 0)) {
+    memory_block.DiscreteTimeIntegrator1_DSTAT_p =
       single_qc_ppid_P.DiscreteTimeIntegrator1_IC_h;
   }
 
-  if (single_qc_ppid_DW.DiscreteTimeIntegrator1_DSTAT_p >=
+  if (memory_block.DiscreteTimeIntegrator1_DSTAT_p >=
       single_qc_ppid_P.DiscreteTimeIntegrator1_Upper_e) {
-    single_qc_ppid_DW.DiscreteTimeIntegrator1_DSTAT_p =
+    memory_block.DiscreteTimeIntegrator1_DSTAT_p =
       single_qc_ppid_P.DiscreteTimeIntegrator1_Upper_e;
   } else {
-    if (single_qc_ppid_DW.DiscreteTimeIntegrator1_DSTAT_p <=
+    if (memory_block.DiscreteTimeIntegrator1_DSTAT_p <=
         single_qc_ppid_P.DiscreteTimeIntegrator1_Lower_f) {
-      single_qc_ppid_DW.DiscreteTimeIntegrator1_DSTAT_p =
+      memory_block.DiscreteTimeIntegrator1_DSTAT_p =
         single_qc_ppid_P.DiscreteTimeIntegrator1_Lower_f;
     }
   }
@@ -482,8 +485,8 @@ int single_qc_ppid_step(void)
    *  Store in Global RAM
    */
   rtb_Sum1_p = (single_qc_ppid_P.pgainbs * rtb_Sum3_b + single_qc_ppid_P.igainbs
-                * single_qc_ppid_DW.DiscreteTimeIntegrator1_DSTAT_p) +
-    (rtb_TSamp_gn - single_qc_ppid_DW.UD_DSTATE_d) * single_qc_ppid_P.dgainbs;
+                * memory_block.DiscreteTimeIntegrator1_DSTAT_p) +
+    (rtb_TSamp_gn - memory_block.UD_DSTATE_d) * single_qc_ppid_P.dgainbs;
 
   /* MATLAB Function: '<Root>/MATLAB Function1' */
   f3 = rtb_Saturation / 4.0F;
@@ -576,7 +579,7 @@ int single_qc_ppid_step(void)
   // q_Bbi[3] = f3 / 0.1472F * 65535.0F;
  
   /* safety */
-  //  if ((fabsf(single_qc_ppid_U.omega_x)>80.0F) || (fabsf(single_qc_ppid_U.beta_speed)>80.0F))
+  //  if ((fabsf(ex_input.omega_x)>80.0F) || (fabsf(ex_input.beta_speed)>80.0F))
   //  {
   //    q_Bbi[0]=0.0F;
   //    q_Bbi[1]=0.0F;
@@ -660,114 +663,114 @@ int single_qc_ppid_step(void)
   /* Outport: '<Root>/m1' incorporates:
    *  DataTypeConversion: '<Root>/Data Type Conversion2'
    */
-  single_qc_ppid_Y.m1 = (uint16_T)(f3 < 0.0F ? (int32_T)(uint16_T)-(int16_T)
+  ex_output.m1 = (uint16_T)(f3 < 0.0F ? (int32_T)(uint16_T)-(int16_T)
     (uint16_T)-f3 : (int32_T)(uint16_T)f3);
 
   /* Outport: '<Root>/m2' incorporates:
    *  DataTypeConversion: '<Root>/Data Type Conversion2'
    */
-  single_qc_ppid_Y.m2 = (uint16_T)(fty < 0.0F ? (int32_T)(uint16_T)-(int16_T)
+  ex_output.m2 = (uint16_T)(fty < 0.0F ? (int32_T)(uint16_T)-(int16_T)
     (uint16_T)-fty : (int32_T)(uint16_T)fty);
 
   /* Outport: '<Root>/m3' incorporates:
    *  DataTypeConversion: '<Root>/Data Type Conversion2'
    */
-  single_qc_ppid_Y.m3 = (uint16_T)(ftx < 0.0F ? (int32_T)(uint16_T)-(int16_T)
+  ex_output.m3 = (uint16_T)(ftx < 0.0F ? (int32_T)(uint16_T)-(int16_T)
     (uint16_T)-ftx : (int32_T)(uint16_T)ftx);
 
   /* Outport: '<Root>/m4' incorporates:
    *  DataTypeConversion: '<Root>/Data Type Conversion2'
    */
-  single_qc_ppid_Y.m4 = (uint16_T)(ftz < 0.0F ? (int32_T)(uint16_T)-(int16_T)
+  ex_output.m4 = (uint16_T)(ftz < 0.0F ? (int32_T)(uint16_T)-(int16_T)
     (uint16_T)-ftz : (int32_T)(uint16_T)ftz);
 
   /* Outport: '<Root>/t_m1' */
-  single_qc_ppid_Y.t_m1 = q_Bbi[0];
+  ex_output.t_m1 = q_Bbi[0];
 
   /* Outport: '<Root>/t_m2' */
-  single_qc_ppid_Y.t_m2 = q_Bbi[1];
+  ex_output.t_m2 = q_Bbi[1];
 
   /* Outport: '<Root>/t_m3' */
-  single_qc_ppid_Y.t_m3 = q_Bbi[2];
+  ex_output.t_m3 = q_Bbi[2];
 
   /* Outport: '<Root>/t_m4' */
-  single_qc_ppid_Y.t_m4 = q_Bbi[3];
+  ex_output.t_m4 = q_Bbi[3];
 
   /* Outport: '<Root>/u_beta' */
-  single_qc_ppid_Y.u_beta = rtb_Sum1_p;
+  ex_output.u_beta = rtb_Sum1_p;
 
   /* Outport: '<Root>/error_betas' */
-  single_qc_ppid_Y.error_betas = rtb_Sum3_b;
+  ex_output.error_betas = rtb_Sum3_b;
 
   /* Outport: '<Root>/error_beta' */
-  single_qc_ppid_Y.error_beta = rtb_Sum1;
+  ex_output.error_beta = rtb_Sum1;
 
   /* Outport: '<Root>/u_alpha' */
-  single_qc_ppid_Y.u_alpha = rtb_Sum1_d;
+  ex_output.u_alpha = rtb_Sum1_d;
 
   /* Outport: '<Root>/error_alphas' */
-  single_qc_ppid_Y.error_alphas = rtb_Sum3;
+  ex_output.error_alphas = rtb_Sum3;
 
   /* Outport: '<Root>/error_alpha' */
-  single_qc_ppid_Y.error_alpha = rtb_Sum;
+  ex_output.error_alpha = rtb_Sum;
 
   /* Outport: '<Root>/t_betae' */
-  single_qc_ppid_Y.t_betae = diff_b;
+  ex_output.t_betae = diff_b;
 
   /* Outport: '<Root>/t_alphae' */
-  single_qc_ppid_Y.t_alphae = diff_a;
+  ex_output.t_alphae = diff_a;
 
   /* Outport: '<Root>/t_betain' incorporates:
    *  Inport: '<Root>/beta_desired'
    */
-  single_qc_ppid_Y.t_betain = single_qc_ppid_U.beta_desired;
+  ex_output.t_betain = ex_input.beta_desired;
 
   /* Outport: '<Root>/t_alphain' incorporates:
    *  Inport: '<Root>/alpha_desired'
    */
-  single_qc_ppid_Y.t_alphain = single_qc_ppid_U.alpha_desired;
+  ex_output.t_alphain = ex_input.alpha_desired;
 
   /* Update for Memory: '<Root>/Memory' incorporates:
    *  MATLAB Function: '<Root>/MATLAB Function'
    */
-  single_qc_ppid_DW.Memory_PreviousInput = q_Bbi_tmp;
+  memory_block.Memory_PreviousInput = q_Bbi_tmp;
 
   /* Update for Memory: '<Root>/Memory1' incorporates:
    *  MATLAB Function: '<Root>/MATLAB Function'
    */
-  single_qc_ppid_DW.Memory1_PreviousInput = q_Bbi_tmp_0;
+  memory_block.Memory1_PreviousInput = q_Bbi_tmp_0;
 
   /* Update for Memory: '<Root>/Memory2' incorporates:
    *  MATLAB Function: '<Root>/MATLAB Function'
    */
-  single_qc_ppid_DW.Memory2_PreviousInput = acount_prev;
+  memory_block.Memory2_PreviousInput = acount_prev;
 
   /* Update for Memory: '<Root>/Memory3' incorporates:
    *  MATLAB Function: '<Root>/MATLAB Function'
    */
-  single_qc_ppid_DW.Memory3_PreviousInput = bcount_prev;
+  memory_block.Memory3_PreviousInput = bcount_prev;
 
   /* Update for Memory: '<Root>/Memory4' */
-  single_qc_ppid_DW.Memory4_PreviousInput = rtb_Saturation;
+  memory_block.Memory4_PreviousInput = rtb_Saturation;
   /*********End of Output**********/
 
   /*********Update**********/
   /* Update for DiscreteIntegrator: '<S7>/Discrete-Time Integrator2' */
-  single_qc_ppid_DW.DiscreteTimeIntegrator2_DSTATE +=
+  memory_block.DiscreteTimeIntegrator2_DSTATE +=
     single_qc_ppid_P.DiscreteTimeIntegrator2_gainval * rtb_Sum;
-  if (single_qc_ppid_DW.DiscreteTimeIntegrator2_DSTATE >=
+  if (memory_block.DiscreteTimeIntegrator2_DSTATE >=
       single_qc_ppid_P.DiscreteTimeIntegrator2_UpperSa) {
-    single_qc_ppid_DW.DiscreteTimeIntegrator2_DSTATE =
+    memory_block.DiscreteTimeIntegrator2_DSTATE =
       single_qc_ppid_P.DiscreteTimeIntegrator2_UpperSa;
   } else {
-    if (single_qc_ppid_DW.DiscreteTimeIntegrator2_DSTATE <=
+    if (memory_block.DiscreteTimeIntegrator2_DSTATE <=
         single_qc_ppid_P.DiscreteTimeIntegrator2_LowerSa) {
-      single_qc_ppid_DW.DiscreteTimeIntegrator2_DSTATE =
+      memory_block.DiscreteTimeIntegrator2_DSTATE =
         single_qc_ppid_P.DiscreteTimeIntegrator2_LowerSa;
     }
   }
 
-  single_qc_ppid_DW.DiscreteTimeIntegrator2_PrevRes = (int8_T)rtb_Compare_h;
+  memory_block.DiscreteTimeIntegrator2_PrevRes = (int8_T)rtb_Compare_h;
 
   /* End of Update for DiscreteIntegrator: '<S7>/Discrete-Time Integrator2' */
 
@@ -777,24 +780,24 @@ int single_qc_ppid_step(void)
    *
    *  Store in Global RAM
    */
-  single_qc_ppid_DW.UD_DSTATE = rtb_TSamp;
+  memory_block.UD_DSTATE = rtb_TSamp;
 
   /* Update for DiscreteIntegrator: '<S7>/Discrete-Time Integrator1' */
-  single_qc_ppid_DW.DiscreteTimeIntegrator1_DSTATE +=
+  memory_block.DiscreteTimeIntegrator1_DSTATE +=
     single_qc_ppid_P.DiscreteTimeIntegrator1_gainval * rtb_Sum3;
-  if (single_qc_ppid_DW.DiscreteTimeIntegrator1_DSTATE >=
+  if (memory_block.DiscreteTimeIntegrator1_DSTATE >=
       single_qc_ppid_P.DiscreteTimeIntegrator1_UpperSa) {
-    single_qc_ppid_DW.DiscreteTimeIntegrator1_DSTATE =
+    memory_block.DiscreteTimeIntegrator1_DSTATE =
       single_qc_ppid_P.DiscreteTimeIntegrator1_UpperSa;
   } else {
-    if (single_qc_ppid_DW.DiscreteTimeIntegrator1_DSTATE <=
+    if (memory_block.DiscreteTimeIntegrator1_DSTATE <=
         single_qc_ppid_P.DiscreteTimeIntegrator1_LowerSa) {
-      single_qc_ppid_DW.DiscreteTimeIntegrator1_DSTATE =
+      memory_block.DiscreteTimeIntegrator1_DSTATE =
         single_qc_ppid_P.DiscreteTimeIntegrator1_LowerSa;
     }
   }
 
-  single_qc_ppid_DW.DiscreteTimeIntegrator1_PrevRes = (int8_T)rtb_Compare_h;
+  memory_block.DiscreteTimeIntegrator1_PrevRes = (int8_T)rtb_Compare_h;
 
   /* End of Update for DiscreteIntegrator: '<S7>/Discrete-Time Integrator1' */
 
@@ -804,31 +807,31 @@ int single_qc_ppid_step(void)
    *
    *  Store in Global RAM
    */
-  single_qc_ppid_DW.UD_DSTATE_j = rtb_TSamp_p2;
+  memory_block.UD_DSTATE_j = rtb_TSamp_p2;
 
   /* Update for DiscreteIntegrator: '<S8>/Discrete-Time Integrator2' */
-  single_qc_ppid_DW.DiscreteTimeIntegrator2_DSTAT_o +=
+  memory_block.DiscreteTimeIntegrator2_DSTAT_o +=
     single_qc_ppid_P.DiscreteTimeIntegrator2_gainv_f * rtb_Sum1;
-  if (single_qc_ppid_DW.DiscreteTimeIntegrator2_DSTAT_o >=
+  if (memory_block.DiscreteTimeIntegrator2_DSTAT_o >=
       single_qc_ppid_P.DiscreteTimeIntegrator2_Upper_l) {
-    single_qc_ppid_DW.DiscreteTimeIntegrator2_DSTAT_o =
+    memory_block.DiscreteTimeIntegrator2_DSTAT_o =
       single_qc_ppid_P.DiscreteTimeIntegrator2_Upper_l;
   } else {
-    if (single_qc_ppid_DW.DiscreteTimeIntegrator2_DSTAT_o <=
+    if (memory_block.DiscreteTimeIntegrator2_DSTAT_o <=
         single_qc_ppid_P.DiscreteTimeIntegrator2_Lower_i) {
-      single_qc_ppid_DW.DiscreteTimeIntegrator2_DSTAT_o =
+      memory_block.DiscreteTimeIntegrator2_DSTAT_o =
         single_qc_ppid_P.DiscreteTimeIntegrator2_Lower_i;
     }
   }
 
   if (rtb_Saturation > 0.0F) {
-    single_qc_ppid_DW.DiscreteTimeIntegrator2_PrevR_e = 1;
+    memory_block.DiscreteTimeIntegrator2_PrevR_e = 1;
   } else if (rtb_Saturation < 0.0F) {
-    single_qc_ppid_DW.DiscreteTimeIntegrator2_PrevR_e = -1;
+    memory_block.DiscreteTimeIntegrator2_PrevR_e = -1;
   } else if (rtb_Saturation == 0.0F) {
-    single_qc_ppid_DW.DiscreteTimeIntegrator2_PrevR_e = 0;
+    memory_block.DiscreteTimeIntegrator2_PrevR_e = 0;
   } else {
-    single_qc_ppid_DW.DiscreteTimeIntegrator2_PrevR_e = 2;
+    memory_block.DiscreteTimeIntegrator2_PrevR_e = 2;
   }
 
   /* End of Update for DiscreteIntegrator: '<S8>/Discrete-Time Integrator2' */
@@ -839,31 +842,31 @@ int single_qc_ppid_step(void)
    *
    *  Store in Global RAM
    */
-  single_qc_ppid_DW.UD_DSTATE_p = rtb_TSamp_c;
+  memory_block.UD_DSTATE_p = rtb_TSamp_c;
 
   /* Update for DiscreteIntegrator: '<S8>/Discrete-Time Integrator1' */
-  single_qc_ppid_DW.DiscreteTimeIntegrator1_DSTAT_p +=
+  memory_block.DiscreteTimeIntegrator1_DSTAT_p +=
     single_qc_ppid_P.DiscreteTimeIntegrator1_gainv_c * rtb_Sum3_b;
-  if (single_qc_ppid_DW.DiscreteTimeIntegrator1_DSTAT_p >=
+  if (memory_block.DiscreteTimeIntegrator1_DSTAT_p >=
       single_qc_ppid_P.DiscreteTimeIntegrator1_Upper_e) {
-    single_qc_ppid_DW.DiscreteTimeIntegrator1_DSTAT_p =
+    memory_block.DiscreteTimeIntegrator1_DSTAT_p =
       single_qc_ppid_P.DiscreteTimeIntegrator1_Upper_e;
   } else {
-    if (single_qc_ppid_DW.DiscreteTimeIntegrator1_DSTAT_p <=
+    if (memory_block.DiscreteTimeIntegrator1_DSTAT_p <=
         single_qc_ppid_P.DiscreteTimeIntegrator1_Lower_f) {
-      single_qc_ppid_DW.DiscreteTimeIntegrator1_DSTAT_p =
+      memory_block.DiscreteTimeIntegrator1_DSTAT_p =
         single_qc_ppid_P.DiscreteTimeIntegrator1_Lower_f;
     }
   }
 
   if (rtb_Saturation > 0.0F) {
-    single_qc_ppid_DW.DiscreteTimeIntegrator1_PrevR_o = 1;
+    memory_block.DiscreteTimeIntegrator1_PrevR_o = 1;
   } else if (rtb_Saturation < 0.0F) {
-    single_qc_ppid_DW.DiscreteTimeIntegrator1_PrevR_o = -1;
+    memory_block.DiscreteTimeIntegrator1_PrevR_o = -1;
   } else if (rtb_Saturation == 0.0F) {
-    single_qc_ppid_DW.DiscreteTimeIntegrator1_PrevR_o = 0;
+    memory_block.DiscreteTimeIntegrator1_PrevR_o = 0;
   } else {
-    single_qc_ppid_DW.DiscreteTimeIntegrator1_PrevR_o = 2;
+    memory_block.DiscreteTimeIntegrator1_PrevR_o = 2;
   }
 
   /* End of Update for DiscreteIntegrator: '<S8>/Discrete-Time Integrator1' */
@@ -874,8 +877,18 @@ int single_qc_ppid_step(void)
    *
    *  Store in Global RAM
    */
-  single_qc_ppid_DW.UD_DSTATE_d = rtb_TSamp_gn;
+  memory_block.UD_DSTATE_d = rtb_TSamp_gn;
   /*********End of Update**********/
+
+  // to debug munully
+  // ex_output.m1 = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * ex_input.thrust/4.0F);
+  // ex_output.m2 = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * ex_input.thrust/4.0F);
+  // ex_output.m3 = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * ex_input.thrust/4.0F);
+  // ex_output.m4 = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * ex_input.thrust/4.0F);
+  // return 0;
+
+  return 0;
+
 }
 
 /* Model initialize function */
@@ -887,40 +900,40 @@ void single_qc_ppid_initialize(void)
   rt_InitInfAndNaN(sizeof(real_T));
 
   /* states (dwork) */
-  (void) memset((void *)&single_qc_ppid_DW, 0,
+  (void) memset((void *)&memory_block, 0,
                 sizeof(DW_single_qc_ppid_T));
 
   /* external inputs */
-  (void)memset(&single_qc_ppid_U, 0, sizeof(ExtU_single_qc_ppid_T));
+  (void)memset(&ex_input, 0, sizeof(ExtU_single_qc_ppid_T));
 
   /* external outputs */
-  (void) memset((void *)&single_qc_ppid_Y, 0,
+  (void) memset((void *)&ex_output, 0,
                 sizeof(ExtY_single_qc_ppid_T));
 
   /* InitializeConditions for Memory: '<Root>/Memory' */
-  single_qc_ppid_DW.Memory_PreviousInput =
+  memory_block.Memory_PreviousInput =
     single_qc_ppid_P.Memory_InitialCondition;
 
   /* InitializeConditions for Memory: '<Root>/Memory1' */
-  single_qc_ppid_DW.Memory1_PreviousInput =
+  memory_block.Memory1_PreviousInput =
     single_qc_ppid_P.Memory1_InitialCondition;
 
   /* InitializeConditions for Memory: '<Root>/Memory2' */
-  single_qc_ppid_DW.Memory2_PreviousInput =
+  memory_block.Memory2_PreviousInput =
     single_qc_ppid_P.Memory2_InitialCondition;
 
   /* InitializeConditions for Memory: '<Root>/Memory3' */
-  single_qc_ppid_DW.Memory3_PreviousInput =
+  memory_block.Memory3_PreviousInput =
     single_qc_ppid_P.Memory3_InitialCondition;
 
   /* InitializeConditions for Memory: '<Root>/Memory4' */
-  single_qc_ppid_DW.Memory4_PreviousInput =
+  memory_block.Memory4_PreviousInput =
     single_qc_ppid_P.Memory4_InitialCondition;
 
   /* InitializeConditions for DiscreteIntegrator: '<S7>/Discrete-Time Integrator2' */
-  single_qc_ppid_DW.DiscreteTimeIntegrator2_DSTATE =
+  memory_block.DiscreteTimeIntegrator2_DSTATE =
     single_qc_ppid_P.DiscreteTimeIntegrator2_IC;
-  single_qc_ppid_DW.DiscreteTimeIntegrator2_PrevRes = 2;
+  memory_block.DiscreteTimeIntegrator2_PrevRes = 2;
 
   /* InitializeConditions for UnitDelay: '<S11>/UD'
    *
@@ -928,12 +941,12 @@ void single_qc_ppid_initialize(void)
    *
    *  Store in Global RAM
    */
-  single_qc_ppid_DW.UD_DSTATE = single_qc_ppid_P.DiscreteDerivative2_ICPrevScale;
+  memory_block.UD_DSTATE = single_qc_ppid_P.DiscreteDerivative2_ICPrevScale;
 
   /* InitializeConditions for DiscreteIntegrator: '<S7>/Discrete-Time Integrator1' */
-  single_qc_ppid_DW.DiscreteTimeIntegrator1_DSTATE =
+  memory_block.DiscreteTimeIntegrator1_DSTATE =
     single_qc_ppid_P.DiscreteTimeIntegrator1_IC;
-  single_qc_ppid_DW.DiscreteTimeIntegrator1_PrevRes = 2;
+  memory_block.DiscreteTimeIntegrator1_PrevRes = 2;
 
   /* InitializeConditions for UnitDelay: '<S10>/UD'
    *
@@ -941,13 +954,13 @@ void single_qc_ppid_initialize(void)
    *
    *  Store in Global RAM
    */
-  single_qc_ppid_DW.UD_DSTATE_j =
+  memory_block.UD_DSTATE_j =
     single_qc_ppid_P.DiscreteDerivative1_ICPrevScale;
 
   /* InitializeConditions for DiscreteIntegrator: '<S8>/Discrete-Time Integrator2' */
-  single_qc_ppid_DW.DiscreteTimeIntegrator2_DSTAT_o =
+  memory_block.DiscreteTimeIntegrator2_DSTAT_o =
     single_qc_ppid_P.DiscreteTimeIntegrator2_IC_h;
-  single_qc_ppid_DW.DiscreteTimeIntegrator2_PrevR_e = 2;
+  memory_block.DiscreteTimeIntegrator2_PrevR_e = 2;
 
   /* InitializeConditions for UnitDelay: '<S13>/UD'
    *
@@ -955,13 +968,13 @@ void single_qc_ppid_initialize(void)
    *
    *  Store in Global RAM
    */
-  single_qc_ppid_DW.UD_DSTATE_p =
+  memory_block.UD_DSTATE_p =
     single_qc_ppid_P.DiscreteDerivative2_ICPrevSca_g;
 
   /* InitializeConditions for DiscreteIntegrator: '<S8>/Discrete-Time Integrator1' */
-  single_qc_ppid_DW.DiscreteTimeIntegrator1_DSTAT_p =
+  memory_block.DiscreteTimeIntegrator1_DSTAT_p =
     single_qc_ppid_P.DiscreteTimeIntegrator1_IC_h;
-  single_qc_ppid_DW.DiscreteTimeIntegrator1_PrevR_o = 2;
+  memory_block.DiscreteTimeIntegrator1_PrevR_o = 2;
 
   /* InitializeConditions for UnitDelay: '<S12>/UD'
    *
@@ -969,7 +982,7 @@ void single_qc_ppid_initialize(void)
    *
    *  Store in Global RAM
    */
-  single_qc_ppid_DW.UD_DSTATE_d =
+  memory_block.UD_DSTATE_d =
     single_qc_ppid_P.DiscreteDerivative1_ICPrevSca_h;
 }
 
