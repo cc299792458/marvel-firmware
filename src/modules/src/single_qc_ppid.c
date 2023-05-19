@@ -544,15 +544,15 @@ void single_qc_ppid_step(void)
     f3 = 0.0F;
   }
 
-  // q_Bbi[0] = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * f0);
-  // q_Bbi[1] = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * ftx);
-  // q_Bbi[2] = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * f2);
-  // q_Bbi[3] = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * f3);
+  q_Bbi[0] = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * f0);
+  q_Bbi[1] = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * ftx);
+  q_Bbi[2] = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * f2);
+  q_Bbi[3] = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * f3);
 
-  q_Bbi[0] = f0 / 0.1472F * 65535.0F;
-  q_Bbi[1] = ftx / 0.1472F * 65535.0F;
-  q_Bbi[2] = f2 / 0.1472F * 65535.0F;
-  q_Bbi[3] = f3 / 0.1472F * 65535.0F;
+  // q_Bbi[0] = f0 / 0.1472F * 65535.0F;
+  // q_Bbi[1] = ftx / 0.1472F * 65535.0F;
+  // q_Bbi[2] = f2 / 0.1472F * 65535.0F;
+  // q_Bbi[3] = f3 / 0.1472F * 65535.0F;
  /* safety */
 //  if ((fabsf(single_qc_ppid_U.omega_x)>80.0F) || (fabsf(single_qc_ppid_U.beta_speed)>80.0F))
 //  {
