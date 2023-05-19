@@ -96,7 +96,8 @@ P_single_qc_ppid_T single_qc_ppid_P = {
   /* Variable: torque_modifier
    * Referenced by: '<Root>/Constant'
    */
-  9.4894F,
+  // 0.048/0.01012
+  4.7431F,
 
   /* Mask Parameter: DiscreteDerivative2_ICPrevScale
    * Referenced by: '<S11>/UD'

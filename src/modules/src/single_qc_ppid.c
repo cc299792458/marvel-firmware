@@ -488,7 +488,7 @@ void single_qc_ppid_step(void)
   /* End of Saturate: '<S6>/Saturation' */
 
   /* MATLAB Function: '<Root>/MATLAB Function1' */
-  ftx = u0 / 4.0F / 0.0556F;
+  ftx = u0 / 4.0F / 0.048F;
 
   /* Saturate: '<S6>/Saturation1' */
   if (rtb_Sum1_p > single_qc_ppid_P.sat_ty) {
@@ -502,7 +502,7 @@ void single_qc_ppid_step(void)
   /* End of Saturate: '<S6>/Saturation1' */
 
   /* MATLAB Function: '<Root>/MATLAB Function1' */
-  fty = fty / 4.0F / 0.047F;
+  fty = fty / 4.0F / 0.048F;
 
   /* Product: '<S6>/Product1' */
   u0 = rtb_Sum1_d * ftz;
