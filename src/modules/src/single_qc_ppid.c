@@ -521,7 +521,7 @@ void single_qc_ppid_step(void)
   /* MATLAB Function: '<Root>/MATLAB Function1' incorporates:
    *  Constant: '<Root>/Constant'
    */
-  ftz = u0 / 4.0F / 0.047F * single_qc_ppid_P.torque_modifier;
+  ftz = u0 / 4.0F / 0.048F * single_qc_ppid_P.torque_modifier;
   u0 = f3 + ftx;
   f0 = (u0 - fty) - ftz;
   f3 -= ftx;
@@ -543,6 +543,11 @@ void single_qc_ppid_step(void)
   if (f3 < 0.0F) {
     f3 = 0.0F;
   }
+
+  // q_Bbi[0] = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * f0);
+  // q_Bbi[1] = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * ftx);
+  // q_Bbi[2] = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * f2);
+  // q_Bbi[3] = 748.4F + 1000.0F * sqrtf(0.5601F + 398.7F * f3);
 
   q_Bbi[0] = f0 / 0.1472F * 65535.0F;
   q_Bbi[1] = ftx / 0.1472F * 65535.0F;

@@ -82,6 +82,7 @@ void controllerSinglePPID(control_t *control, setpoint_t *setpoint,
   // single_qc_ppid_U.omega_z = 0.0f;     //test
 
   single_qc_ppid_U.thrust = setpoint->thrust;
+  // single_qc_ppid_U.thrust = 4 * (2.508e-9F * setpoint->thrust * setpoint->thrust - 3.754e-6F * setpoint->thrust);
 
   // Add a condition judgement here
   // if (setpoint->thrust > 0){    
