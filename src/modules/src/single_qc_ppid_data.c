@@ -137,7 +137,8 @@ P_single_qc_ppid_T single_qc_ppid_P = {
   /* Computed Parameter: Saturation_UpperSat
    * Referenced by: '<Root>/Saturation'
    */
-  0.7F,
+  // 6N for each motor * 4
+  24.0F,
 
   /* Computed Parameter: Saturation_LowerSat
    * Referenced by: '<Root>/Saturation'
