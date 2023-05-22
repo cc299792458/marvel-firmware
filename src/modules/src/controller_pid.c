@@ -26,9 +26,9 @@ static float r_roll;
 static float r_pitch;
 static float r_yaw;
 static float accelz;
-static float vel_x;
-static float vel_y;
-static float vel_z;
+// static float vel_x;
+// static float vel_y;
+// static float vel_z;
 
 void controllerPidInit(void)
 {

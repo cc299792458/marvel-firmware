@@ -116,9 +116,9 @@ static struct this_s this = {
   #else
     .pidVZ = {
       .pid = {
-        .kp = 25.0f,
-        .ki = 15.0f,
-        .kd = 0.0f,   // modified by Chi Chu, used to be 0
+        .kp = 3.0f,
+        .ki = 1.0f,
+        .kd = 1.5f,   // modified by Chi Chu, used to be 0
       },
       .pid.dt = DT,
     },
